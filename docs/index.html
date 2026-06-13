@@ -1,380 +1,79 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>bhidu-lang | Mumbai's Swag-Filled Programming Language</title>
-  <meta name="description" content="A toy programming language written in TypeScript featuring Mumbai's own Jackie Shroff / Bhidu slang keywords. Fully featured with a CLI, AST parser, and REPL.">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>bhidu-lang v1.0.0 Documentation</title>
+  <meta name="description" content="Complete documentation reference for bhidu-lang. Mumbai's own toy programming language written in TypeScript, featuring variables, loops, scoping, and a CLI/REPL.">
+  <meta name="author" content="Ghost Compiler">
+  <meta name="robots" content="index,follow">
+  <meta name="theme-color" content="#8ee43f">
+  <meta name="application-name" content="Bhidu Lang Documentation">
   
-  <!-- Google Fonts -->
+  <!-- Google Fonts Connection -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   
-  <!-- CSS Styles -->
+  <link rel="stylesheet" href="styles.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "bhidu-lang v1.0.0 Documentation",
+    "about": "Mumbai slang toy programming language written in TypeScript",
+    "author": {
+      "@type": "Organization",
+      "name": "Ghost Compiler"
+    },
+    "version": "1.0.0"
+  }
+  </script>
+
+  <!-- Embed extra custom styles for playground -->
   <style>
-    :root {
-      --bg-color: #07080b;
-      --card-bg: rgba(13, 16, 23, 0.75);
-      --card-border: rgba(142, 228, 63, 0.1);
-      --primary: #8ee43f;
-      --primary-hover: #9bf049;
-      --primary-glow: rgba(142, 228, 63, 0.25);
-      --text-main: #f3f4f6;
-      --text-muted: #9ca3af;
-      --text-accent: #b6f376;
-      --terminal-bg: #050608;
-      --sidebar-width: 280px;
-      --accent-green: #8ee43f;
-      --accent-blue: #29b6f6;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: 'Outfit', sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      line-height: 1.6;
-      overflow-x: hidden;
-      display: flex;
-      scroll-behavior: smooth;
-    }
-
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-    ::-webkit-scrollbar-track {
-      background: var(--bg-color);
-    }
-    ::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--primary);
-    }
-
-    /* Grid & Layout */
-    aside {
-      width: var(--sidebar-width);
-      height: 100vh;
-      position: fixed;
-      top: 0;
-      left: 0;
-      background: rgba(10, 11, 17, 0.95);
-      border-right: 1px solid var(--card-border);
-      padding: 2.5rem 1.5rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      z-index: 100;
-      backdrop-filter: blur(10px);
-    }
-
-    main {
-      margin-left: var(--sidebar-width);
-      width: calc(100% - var(--sidebar-width));
-      padding: 3rem 5%;
-      min-height: 100vh;
-    }
-
-    /* Sidebar Styles */
-    .logo-container {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      margin-bottom: 3rem;
-    }
-
-    .logo-img {
-      width: 38px;
-      height: 38px;
-      border-radius: 8px;
-      border: 1.5px solid var(--primary);
-      object-fit: cover;
-      box-shadow: 0 0 10px var(--primary-glow);
-    }
-
-    .logo-text {
-      font-size: 1.4rem;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      color: var(--text-main);
-    }
-
-    .logo-badge {
-      font-size: 0.65rem;
-      background: var(--primary);
-      color: white;
-      padding: 0.15rem 0.4rem;
-      border-radius: 5px;
-      font-weight: 600;
-      vertical-align: middle;
-      margin-left: 0.3rem;
-    }
-
-    .nav-links {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      flex-grow: 1;
-    }
-
-    .nav-links a {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: 1rem;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.6rem 0.75rem;
-      border-radius: 8px;
-      transition: all 0.2s ease-in-out;
-    }
-
-    .nav-links a:hover, .nav-links li.active a {
-      color: var(--text-main);
-      background: rgba(255, 255, 255, 0.05);
-      border-left: 3px solid var(--primary);
-      padding-left: calc(0.75rem - 3px);
-    }
-
-    .sidebar-footer {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      border-top: 1px solid var(--card-border);
-      padding-top: 1.5rem;
-    }
-
-    .sidebar-footer a {
-      color: var(--primary);
-      text-decoration: none;
-    }
-
-    /* Section Styles */
-    section {
-      margin-bottom: 5rem;
-      scroll-margin-top: 3rem;
-    }
-
-    h1, h2, h3 {
-      font-weight: 700;
-      color: var(--text-main);
-    }
-
-    h1 {
-      font-size: 3.5rem;
-      margin-bottom: 1rem;
-      background: linear-gradient(to right, #ffffff, #b6f376);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: -1px;
-    }
-
-    h2 {
-      font-size: 2rem;
-      margin-bottom: 1.5rem;
-      border-bottom: 1px solid var(--card-border);
-      padding-bottom: 0.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    h2::before {
-      content: '';
-      display: inline-block;
-      width: 4px;
-      height: 1.5rem;
-      background: var(--primary);
-      border-radius: 2px;
-    }
-
-    p {
-      color: var(--text-muted);
-      margin-bottom: 1.5rem;
-      font-size: 1.1rem;
-    }
-
-    /* Banner/Hero */
-    .hero {
-      position: relative;
-      padding: 4rem 0;
-    }
-
-    .hero-tagline {
-      font-size: 1.4rem;
-      color: var(--text-accent);
-      font-weight: 500;
-      margin-bottom: 2rem;
-    }
-
-    .hero-actions {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      margin-top: 2rem;
-    }
-
-    .btn {
-      padding: 0.8rem 1.8rem;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 600;
-      text-decoration: none;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      border: none;
-    }
-
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-      box-shadow: 0 4px 15px var(--primary-glow);
-    }
-
-    .btn-primary:hover {
-      background: var(--primary-hover);
-      transform: translateY(-2px);
-    }
-
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text-main);
-      border: 1px solid var(--card-border);
-    }
-
-    .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.1);
-      transform: translateY(-2px);
-    }
-
-    .copy-install {
-      background: var(--terminal-bg);
-      border: 1px solid var(--card-border);
-      padding: 0.8rem 1.2rem;
-      border-radius: 8px;
-      font-family: 'Fira Code', monospace;
-      font-size: 0.95rem;
-      color: var(--text-main);
-      display: inline-flex;
-      align-items: center;
-      gap: 1.5rem;
-      margin-top: 1rem;
-    }
-
-    .copy-btn {
-      background: none;
-      border: none;
-      color: var(--primary);
-      cursor: pointer;
-      font-weight: 600;
-      font-family: 'Outfit', sans-serif;
-      transition: color 0.2s;
-    }
-
-    .copy-btn:hover {
-      color: var(--primary-hover);
-    }
-
-    /* Cards */
-    .grid-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5rem;
-      margin-top: 2rem;
-    }
-
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 1.75rem;
-      backdrop-filter: blur(10px);
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .card:hover {
-      transform: translateY(-5px);
-      border-color: rgba(142, 228, 63, 0.3);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 15px rgba(142, 228, 63, 0.05);
-    }
-
-    .card h3 {
-      font-size: 1.25rem;
-      margin-bottom: 0.75rem;
-      color: var(--text-accent);
-    }
-
-    .card p {
-      font-size: 0.95rem;
-      margin-bottom: 0;
-    }
-
-    .card-icon {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
-
-    /* Playground Panel */
     .playground-container {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 1.5rem;
-      margin-top: 2rem;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      gap: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px;
+      background: var(--soft);
+      margin: 24px 0;
+      box-shadow: var(--shadow);
     }
-
     @media (max-width: 900px) {
       .playground-container {
         grid-template-columns: 1fr;
       }
     }
-
     .editor-pane, .terminal-pane {
       display: flex;
       flex-direction: column;
-      border-radius: 8px;
+      border-radius: var(--radius-sm);
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--line);
+      background: #0f1015;
     }
-
     .pane-header {
       background: rgba(255, 255, 255, 0.03);
-      padding: 0.75rem 1rem;
+      padding: 10px 14px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
       display: flex;
       justify-content: space-between;
       align-items: center;
       font-weight: 500;
-      font-size: 0.85rem;
-      color: var(--text-muted);
+      font-size: 0.8rem;
+      color: #71717a;
     }
-
     .dot-indicators {
       display: flex;
       gap: 5px;
     }
-
     .dot {
-      width: 10px;
-      height: 10px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
     }
     .dot-red { background: #ff5f56; }
@@ -382,379 +81,435 @@
     .dot-green { background: #27c93f; }
 
     .code-editor {
-      background: #0f1015;
-      padding: 1.25rem;
-      font-family: 'Fira Code', monospace;
-      font-size: 0.9rem;
+      padding: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
       color: #a9b2c3;
-      height: 320px;
+      height: 280px;
       overflow-y: auto;
       white-space: pre-wrap;
     }
-
     .terminal-body {
-      background: var(--terminal-bg);
-      padding: 1.25rem;
-      font-family: 'Fira Code', monospace;
-      font-size: 0.9rem;
-      color: #4caf50;
-      height: 320px;
+      background: #06070a;
+      padding: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: #8ee43f;
+      height: 280px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
-      gap: 0.5rem;
+      gap: 6px;
     }
-
     .terminal-line {
       min-height: 1.2rem;
     }
-
     .terminal-input {
       color: #ffb74d;
     }
-
     .playground-controls {
       grid-column: 1 / -1;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-top: 1rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+      flex-wrap: wrap;
+      gap: 12px;
     }
-
     .selector-container {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 10px;
     }
-
     .selector-container label {
-      font-size: 0.9rem;
-      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--muted);
     }
-
     select {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--card-border);
-      color: var(--text-main);
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
+      background: var(--bg-grid);
+      border: 1px solid var(--line);
+      color: var(--text);
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
       outline: none;
       cursor: pointer;
       font-family: inherit;
     }
-
-    select:focus {
-      border-color: var(--primary);
-    }
-
-    /* Dictionary Table */
-    .table-container {
-      overflow-x: auto;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      margin-top: 2rem;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-    }
-
-    th, td {
-      padding: 1rem 1.5rem;
-      border-bottom: 1px solid var(--card-border);
-    }
-
-    th {
-      background: rgba(255, 255, 255, 0.02);
-      color: var(--text-accent);
-      font-weight: 600;
-      font-size: 1rem;
-    }
-
-    tr:last-child td {
-      border-bottom: none;
-    }
-
-    tr:hover td {
-      background: rgba(255, 255, 255, 0.01);
-    }
-
-    .badge-keyword {
-      font-family: 'Fira Code', monospace;
-      color: var(--primary);
-      background: rgba(142, 228, 63, 0.15);
-      padding: 0.2rem 0.5rem;
-      border-radius: 4px;
-      font-weight: 500;
-    }
-
-    .badge-js {
-      font-family: 'Fira Code', monospace;
-      color: var(--accent-blue);
-      background: rgba(33, 150, 243, 0.1);
-      padding: 0.2rem 0.5rem;
-      border-radius: 4px;
-      font-weight: 500;
-    }
-
-    /* Syntax Highlighting in Editor */
+    
+    /* Code styling tags */
     .token-keyword { color: #8ee43f; font-weight: 600; }
-    .token-string { color: #8bc34a; }
-    .token-number { color: #ffb74d; }
+    .token-string { color: #66bb6a; }
+    .token-number { color: #ffa726; }
     .token-comment { color: #5c6370; font-style: italic; }
-    .token-ident { color: #61afef; }
-
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-      aside {
-        display: none;
-      }
-      main {
-        margin-left: 0;
-        width: 100%;
-        padding: 2rem 5%;
-      }
-      h1 {
-        font-size: 2.5rem;
-      }
-    }
   </style>
 </head>
-<body>
-
-  <!-- Navigation Sidebar -->
-  <aside>
-    <div>
-      <div class="logo-container">
-        <img src="logo.png" alt="logo" class="logo-img">
-        <span class="logo-text">bhidu-lang<span class="logo-badge">v1.0.0</span></span>
+<body class="docs-page">
+  <header class="site-header docs-header">
+    <button id="mobileMenuBtn" class="mobile-menu-btn" aria-label="Toggle navigation">
+      <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
+    <a class="brand" href="#overview">
+      <img src="logo.png" alt="bhidu-lang logo">
+      <span>bhidu-lang</span>
+    </a>
+    <span class="version-pill">v1.0.0</span>
+    <div class="doc-search">
+      <input id="docSearch" type="search" placeholder="Search documentation">
+    </div>
+    <nav class="top-links">
+      <a href="#overview">Overview</a>
+      <a href="#installation">Install</a>
+      <a href="#syntax">Syntax</a>
+      <a href="#cli">CLI</a>
+      <a href="#repl">REPL</a>
+      
+      <!-- Segmented Theme Switcher Control -->
+      <div class="theme-segmented-control" role="radiogroup" aria-label="Theme switcher">
+        <button class="theme-control-btn" data-theme-val="light" aria-label="Light Mode" title="Light Mode">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        </button>
+        <button class="theme-control-btn" data-theme-val="dark" aria-label="Dark Mode" title="Dark Mode">
+          <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+        <button class="theme-control-btn" data-theme-val="system" aria-label="System Mode" title="System Mode">
+          <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+        </button>
       </div>
-      <ul class="nav-links">
-        <li class="active"><a href="#intro">🏡 Chalu Karte Hai</a></li>
-        <li><a href="#playground">🎮 Playground</a></li>
-        <li><a href="#dictionary">📖 Slang Dictionary</a></li>
-        <li><a href="#syntax">📝 Syntax Guide</a></li>
-        <li><a href="#cli">🛠️ CLI Reference</a></li>
-      </ul>
-    </div>
-    <div class="sidebar-footer">
-      Made for fun by <a href="https://github.com/ghostcompiler" target="_blank">ghostcompiler</a>
-    </div>
-  </aside>
+    </nav>
+  </header>
 
-  <!-- Main Content Area -->
-  <main>
-    
-    <!-- Hero Banner -->
-    <section id="intro" class="hero">
-      <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem; flex-wrap: wrap;">
-        <img src="logo.png" alt="logo" style="width: 100px; height: 100px; border-radius: 16px; border: 2.5px solid var(--primary); box-shadow: 0 0 25px var(--primary-glow); object-fit: cover;">
-        <div>
-          <h1>bhidu-lang</h1>
-          <p class="hero-tagline" style="margin-bottom: 0;">Mumbai's own toy programming language, written in TypeScript. Bole toh ekdum solid! 🕶️</p>
+  <!-- Overlay for mobile navigation drawer -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar" id="docsSidebar" aria-label="Documentation navigation">
+      <div class="sidebar-header-mobile">
+        <span>Navigation</span>
+        <button id="closeSidebarBtn" class="close-sidebar-btn" aria-label="Close navigation">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="sidebar-group">
+        <p>Start</p>
+        <a href="#overview">Overview</a>
+        <a href="#installation">Installation</a>
+        <a href="#playground">Playground</a>
+      </div>
+      
+      <div class="sidebar-group">
+        <p>CLI & Tools</p>
+        <a href="#cli">CLI Reference</a>
+        <a href="#repl">Interactive REPL</a>
+      </div>
+
+      <div class="sidebar-group">
+        <p>Language Syntax</p>
+        <a href="#variables">Variables</a>
+        <a href="#control-flow">Control Flow</a>
+        <a href="#loops">Loops & Iteration</a>
+        <a href="#blocks">Naked Blocks</a>
+      </div>
+
+      <div class="sidebar-group">
+        <p>Reference</p>
+        <a href="#cheatsheet">Slang Dictionary</a>
+        <a href="#errors">Slang Errors</a>
+      </div>
+    </aside>
+
+    <main class="doc-article">
+      
+      <section id="overview" data-title="Overview">
+        <p class="eyebrow">Documentation v1.0.0</p>
+        <h1>Overview</h1>
+        <p class="lead"><strong>bhidu-lang</strong> is a premium, feature-rich toy programming language written in TypeScript featuring Mumbai's own local slang (inspired by Jackie Shroff). Compile, run scripts, test environment scopes, and play with error messages, bole toh ekdum jhakaas! 🕶️</p>
+        <div class="callout">
+          <strong>Fully Type-Safe Compiler Engine.</strong>
+          Built in TypeScript with a custom sticky-regex Tokenizer, recursive-descent AST Parser, parent-linked Environment Scope resolver, and AST Evaluator.
         </div>
-      </div>
-      
-      <p>Ever wanted a programming language that speaks like a true Mumbai local? Inspired by Jackie Shroff's slang, <strong>bhidu-lang</strong> brings variables, loops, conditional scoping, and localized CLI tools to your terminal. Write code, trigger custom slang errors, and explore compilations easily.</p>
-      
-      <div class="hero-actions">
-        <a href="#playground" class="btn btn-primary">🎮 Try Playground</a>
-        <a href="#dictionary" class="btn btn-secondary">📖 View Dictionary</a>
-      </div>
+      </section>
 
-      <div class="copy-install">
-        <span>$ npm install -g bhidu-lang</span>
-        <button class="copy-btn" onclick="copyInstallCommand()">Copy</button>
-      </div>
-    </section>
+      <section id="installation" data-title="Installation">
+        <h2>Installation</h2>
+        <p>Install the library globally via NPM to make the command line tools available anywhere on your machine:</p>
+        <pre><code>npm install -g bhidu-lang</code></pre>
+        <p>To run during local development, clone the repository, build, and use npm link:</p>
+        <pre><code>git clone https://github.com/ghostcompiler/bhidu-language.git
+cd bhidu-language
+npm install
+npm run build
+npm link</code></pre>
+      </section>
 
-    <!-- Interactive Simulator / Playground -->
-    <section id="playground">
-      <h2>Interactive Simulator</h2>
-      <p>Select a script below, click <strong>"Chalao Code!"</strong>, and watch the simulated parser run the code node-by-node in the virtual terminal.</p>
-      
-      <div class="playground-container">
-        <!-- virtual editor -->
-        <div class="editor-pane">
-          <div class="pane-header">
-            <div class="dot-indicators">
-              <span class="dot dot-red"></span>
-              <span class="dot dot-yellow"></span>
-              <span class="dot dot-green"></span>
+      <section id="playground" data-title="Playground">
+        <h2>Interactive Simulator</h2>
+        <p>Select a script below, click <strong>"Chalao Code! 🚀"</strong>, and watch the simulated interpreter run your slang code node-by-node in the virtual console.</p>
+        
+        <div class="playground-container">
+          <!-- virtual editor -->
+          <div class="editor-pane">
+            <div class="pane-header">
+              <div class="dot-indicators">
+                <span class="dot dot-red"></span>
+                <span class="dot dot-yellow"></span>
+                <span class="dot dot-green"></span>
+              </div>
+              <span>main.bhidu</span>
             </div>
-            <span>editor.bhidu</span>
+            <div id="editor" class="code-editor"></div>
           </div>
-          <div id="editor" class="code-editor"></div>
-        </div>
 
-        <!-- virtual terminal -->
-        <div class="terminal-pane">
-          <div class="pane-header">
-            <span>Virtual Console</span>
+          <!-- virtual terminal -->
+          <div class="terminal-pane">
+            <div class="pane-header">
+              <span>Virtual Console</span>
+            </div>
+            <div id="terminal" class="terminal-body">
+              <div class="terminal-line">Virtual terminal ready. Click "Chalao Code!"</div>
+            </div>
           </div>
-          <div id="terminal" class="terminal-body">
-            <div class="terminal-line">Virtual terminal ready. Click "Chalao Code!"</div>
+
+          <!-- controls -->
+          <div class="playground-controls">
+            <div class="selector-container">
+              <label for="example-select">Choose Example:</label>
+              <select id="example-select" onchange="loadExample()">
+                <option value="hello">Hello Bhidu (Print)</option>
+                <option value="variables">Variables & Math</option>
+                <option value="condition">If-Else (Agar-Warna)</option>
+                <option value="loop">Loops & Break (Jab Tak)</option>
+                <option value="error">Slang Error Trigger</option>
+              </select>
+            </div>
+            <button class="run-btn" onclick="simulateCode()">Chalao Code! 🚀</button>
           </div>
         </div>
+      </section>
 
-        <!-- controls -->
-        <div class="playground-controls">
-          <div class="selector-container">
-            <label for="example-select">Choose Example:</label>
-            <select id="example-select" onchange="loadExample()">
-              <option value="hello">Hello Bhidu (Print)</option>
-              <option value="variables">Variables & Math</option>
-              <option value="condition">If-Else (Agar-Warna)</option>
-              <option value="loop">Loops & Break (Jab Tak)</option>
-              <option value="error">Slang Error Trigger</option>
-            </select>
-          </div>
-          <button class="btn btn-primary" onclick="simulateCode()">Chalao Code! 🚀</button>
+      <section id="cli" data-title="CLI Reference">
+        <h2>CLI Reference</h2>
+        <p>The compiler binary is mapped globally to `bhidu` (or you can invoke it using `node dist/cli.js`). Use the following command parameters:</p>
+        
+        <div class="command-list">
+          <p><strong>Execute a file:</strong></p>
+          <code>bhidu run filename.bhidu</code>
+          <p><strong>Inspecting AST Structure:</strong></p>
+          <code>bhidu ast filename.bhidu</code>
+          <p><strong>Run Interactive REPL:</strong></p>
+          <code>bhidu repl</code>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- Slang Dictionary -->
-    <section id="dictionary">
-      <h2>Slang Keywords</h2>
-      <p>Here is your reference guide to scripting in bhidu-lang. Trade standard JS/TS operators for local slang.</p>
-      
-      <div class="table-container">
+      <section id="repl" data-title="Interactive REPL">
+        <h2>Interactive REPL</h2>
+        <p>Start a live interactive session where you can type code statements line-by-line. The REPL preserves variables in a persistent scope environment across lines.</p>
+        <pre><code>$ bhidu repl
+=========================================
+   Bhidu-Lang Interactive REPL v1.0.0
+   Sab chalta hai bhidu! Type '.exit' to exit.
+=========================================
+chalu kar bhidu
+bhidu> bhidu ye hai x = 10;
+bhidu> bhidu ye hai y = 20;
+bhidu> bhidu bolta hai("x + y = " + (x + y));
+x + y = 30
+bhidu> .exit
+khatam bhidu</code></pre>
+        <div class="callout">
+          <strong>Under the Hood.</strong>
+          Since the parser requires code to reside inside program boundaries, the REPL dynamically wraps each line with entry/exit headers (`chalu kar bhidu` / `khatam bhidu`) on the fly, then executes the AST nodes on a persistent global Environment reference.
+        </div>
+      </section>
+
+      <section id="variables" data-title="Variables">
+        <h2>Variables & Reassignment</h2>
+        <p>Variables are declared using the <code>bhidu ye hai</code> keyword, followed by an assignment and a terminating semicolon (;) which is mandatory. Reassigning a variable does not require the declaration prefix.</p>
+        <pre><code>chalu kar bhidu
+  bhidu ye hai naam = "Jackie Shroff";
+  bhidu ye hai age = 69;
+  
+  // Reassignment
+  age = 70;
+  
+  bhidu bolta hai(naam + " is " + age + " years old.");
+khatam bhidu</code></pre>
+      </section>
+
+      <section id="control-flow" data-title="Control Flow">
+        <h2>Control Flow (If-Else)</h2>
+        <p>Conditional branches are declared using <code>agar bhidu</code>, <code>warna agar bhidu</code>, and <code>warna bhidu</code>. Braces represent execution block scopes.</p>
+        <pre><code>chalu kar bhidu
+  bhidu ye hai speed = 120;
+  
+  agar bhidu (speed > 100) {
+    bhidu bolta hai("Bohot bhaag raha hai bhidu!");
+  } warna agar bhidu (speed > 60) {
+    bhidu bolta hai("Sahi jaa raha hai!");
+  } warna bhidu {
+    bhidu bolta hai("Aadmi hai ki halwa, thoda chal!");
+  }
+khatam bhidu</code></pre>
+      </section>
+
+      <section id="loops" data-title="Loops & Iteration">
+        <h2>Loops (While)</h2>
+        <p>Iterate using the while loop block: <code>jab tak bhidu</code>. Inside a loop block, control execution flow using <code>bas kar bhidu</code> (break) or <code>agli baar bhidu</code> (continue).</p>
+        <pre><code>chalu kar bhidu
+  bhidu ye hai counter = 0;
+  
+  jab tak bhidu (counter < 10) {
+    counter = counter + 1;
+    
+    agar bhidu (counter == 3) {
+      agli baar bhidu; // skip 3
+    }
+    
+    agar bhidu (counter == 7) {
+      bas kar bhidu; // stop at 7
+    }
+    
+    bhidu bolta hai(counter);
+  }
+khatam bhidu</code></pre>
+      </section>
+
+      <section id="blocks" data-title="Naked Blocks">
+        <h2>Naked Blocks & Shadowing</h2>
+        <p>Curly braces <code>{ ... }</code> define local scoping. If you define a variable with the same name inside a nested block, it shadows the outer scope variable until execution leaves the block.</p>
+        <pre><code>chalu kar bhidu
+  bhidu ye hai a = 10;
+  {
+    bhidu ye hai a = 20;
+    bhidu bolta hai(a); // Prints 20
+  }
+  bhidu bolta hai(a); // Prints 10
+khatam bhidu</code></pre>
+      </section>
+
+      <section id="cheatsheet" data-title="Slang Dictionary">
+        <h2>Slang Dictionary Reference</h2>
+        <p>Use this table to look up equivalents of standard keywords.</p>
         <table>
           <thead>
             <tr>
-              <th>Bhidu Slang</th>
+              <th>Slang Keyword</th>
               <th>JS Equivalent</th>
-              <th>What it does</th>
+              <th>Description</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td><span class="badge-keyword">chalu kar bhidu</span></td>
+              <td><code>chalu kar bhidu</code></td>
               <td>*(implicit)*</td>
-              <td>Program opening syntax. Essential at the top of the file!</td>
+              <td>Program opening tag</td>
             </tr>
             <tr>
-              <td><span class="badge-keyword">khatam bhidu</span></td>
+              <td><code>khatam bhidu</code></td>
               <td>*(implicit)*</td>
-              <td>Program closing syntax. Must close your file with this.</td>
+              <td>Program closing tag</td>
             </tr>
             <tr>
-              <td><span class="badge-keyword">bhidu ye hai</span></td>
-              <td><span class="badge-js">let / var</span></td>
-              <td>Declare a variable (e.g. <code>bhidu ye hai counter = 0;</code>)</td>
+              <td><code>bhidu ye hai</code></td>
+              <td><code>let / var</code></td>
+              <td>Variable declaration</td>
             </tr>
             <tr>
-              <td><span class="badge-keyword">bhidu bolta hai(...)</span></td>
-              <td><span class="badge-js">console.log(...)</span></td>
-              <td>Outputs expressions, variables or calculations to the console.</td>
+              <td><code>sahi bhidu</code></td>
+              <td><code>true</code></td>
+              <td>Boolean true</td>
             </tr>
             <tr>
-              <td><span class="badge-keyword">sahi bhidu</span></td>
-              <td><span class="badge-js">true</span></td>
-              <td>Boolean true state.</td>
+              <td><code>galat bhidu</code></td>
+              <td><code>false</code></td>
+              <td>Boolean false</td>
             </tr>
             <tr>
-              <td><span class="badge-keyword">galat bhidu</span></td>
-              <td><span class="badge-js">false</span></td>
-              <td>Boolean false state.</td>
+              <td><code>khali bhidu</code></td>
+              <td><code>null</code></td>
+              <td>Null / Empty value</td>
             </tr>
             <tr>
-              <td><span class="badge-keyword">khali bhidu</span></td>
-              <td><span class="badge-js">null</span></td>
-              <td>Empty reference or null variable state.</td>
+              <td><code>bhidu bolta hai(...)</code></td>
+              <td><code>console.log(...)</code></td>
+              <td>Prints to stdout console</td>
             </tr>
             <tr>
-              <td><span class="badge-keyword">agar bhidu(...)</span></td>
-              <td><span class="badge-js">if(...)</span></td>
-              <td>Execute block if condition evaluates to true.</td>
+              <td><code>agar bhidu(...)</code></td>
+              <td><code>if(...)</code></td>
+              <td>Conditional check</td>
             </tr>
             <tr>
-              <td><span class="badge-keyword">warna agar bhidu(...)</span></td>
-              <td><span class="badge-js">else if(...)</span></td>
-              <td>Execute fallback check block.</td>
+              <td><code>warna agar bhidu(...)</code></td>
+              <td><code>else if(...)</code></td>
+              <td>Alternate conditional check</td>
             </tr>
             <tr>
-              <td><span class="badge-keyword">warna bhidu</span></td>
-              <td><span class="badge-js">else</span></td>
-              <td>Default conditional execution block.</td>
+              <td><code>warna bhidu</code></td>
+              <td><code>else</code></td>
+              <td>Fallback condition block</td>
             </tr>
             <tr>
-              <td><span class="badge-keyword">jab tak bhidu(...)</span></td>
-              <td><span class="badge-js">while(...)</span></td>
-              <td>Iterative block that runs as long as the condition holds.</td>
+              <td><code>jab tak bhidu(...)</code></td>
+              <td><code>while(...)</code></td>
+              <td>While loop block</td>
             </tr>
             <tr>
-              <td><span class="badge-keyword">bas kar bhidu</span></td>
-              <td><span class="badge-js">break</span></td>
-              <td>Exits loops immediately.</td>
+              <td><code>bas kar bhidu</code></td>
+              <td><code>break</code></td>
+              <td>Exit loop execution</td>
             </tr>
             <tr>
-              <td><span class="badge-keyword">agli baar bhidu</span></td>
-              <td><span class="badge-js">continue</span></td>
-              <td>Skips the current loop step and starts the next iteration.</td>
+              <td><code>agli baar bhidu</code></td>
+              <td><code>continue</code></td>
+              <td>Skip current loop cycle</td>
             </tr>
           </tbody>
         </table>
-      </div>
-    </section>
+      </section>
 
-    <!-- Syntax Guide -->
-    <section id="syntax">
-      <h2>Syntax Guide</h2>
-      <p>Quick structures to help you get writing in no time.</p>
+      <section id="errors" data-title="Slang Errors">
+        <h2>Slang Runtime & Syntax Errors</h2>
+        <p>Errors throw highly descriptive and localized messages in Mumbai slang to make debugging fun!</p>
+        
+        <div class="callout">
+          <strong>Undeclared Variable:</strong><br>
+          <code>Kya re bhidu! Line 3 pe error: Ye 'x' variable kidhar se laya? Pehle declare toh kar ('bhidu ye hai x = ...')!</code>
+        </div>
+
+        <div class="callout">
+          <strong>Redeclared Variable:</strong><br>
+          <code>Kya re bhidu! Line 4 pe error: Ye 'a' variable pehle se bana chuka hai tu!</code>
+        </div>
+
+        <div class="callout">
+          <strong>Division by Zero:</strong><br>
+          <code>Kya re bhidu! Line 3 pe error: Zero (0) se divide kar raha hai? Dhandha bandh karwayega kya!</code>
+        </div>
+
+        <div class="callout">
+          <strong>Missing Entry / Exit Point:</strong><br>
+          <code>Abe bhidu! Khali file kyun diya? Code chalu karne ke liye 'chalu kar bhidu' likh pehle!</code><br>
+          <code>Kya re bhidu! Line 12 pe program khatam ho gaya par bandh nahi kiya? 'khatam bhidu' bolna padega!</code>
+        </div>
+      </section>
       
-      <div class="grid-cards">
-        <div class="card">
-          <div class="card-icon">⚡</div>
-          <h3>Main File Structure</h3>
-          <p>Every file must end with <code>.bhidu</code> and encapsulate statements inside <code>chalu kar bhidu</code> and <code>khatam bhidu</code>.</p>
-        </div>
-        <div class="card">
-          <div class="card-icon">🔒</div>
-          <h3>Variables & Reassignment</h3>
-          <p>Initialize variables using <code>bhidu ye hai x = 5;</code>. Reassignment doesn't require prefix keywords: <code>x = 10;</code>.</p>
-        </div>
-        <div class="card">
-          <div class="card-icon">🛠️</div>
-          <h3>Blocks & Scoping</h3>
-          <p>Standard bracket scopes <code>{ ... }</code> isolate variables. Nested blocks support variable shadowing out of the box.</p>
-        </div>
-      </div>
-    </section>
+    </main>
+  </div>
 
-    <!-- CLI Reference -->
-    <section id="cli">
-      <h2>CLI Commands Reference</h2>
-      <p>How to run, parse, and execute programs from your host terminal once installed.</p>
-      
-      <div class="grid-cards">
-        <div class="card">
-          <h3>bhidu run &lt;file&gt;</h3>
-          <p>Compiles, parses, and executes the target script directly.</p>
-          <p style="font-family: 'Fira Code', monospace; margin-top: 1rem; color: var(--primary); font-size: 0.85rem;">node dist/cli.js run test.bhidu</p>
-        </div>
-        <div class="card">
-          <h3>bhidu repl</h3>
-          <p>Launches interactive shell. Preserve environment states and write line-by-line statements.</p>
-          <p style="font-family: 'Fira Code', monospace; margin-top: 1rem; color: var(--primary); font-size: 0.85rem;">node dist/cli.js repl</p>
-        </div>
-        <div class="card">
-          <h3>bhidu ast &lt;file&gt;</h3>
-          <p>Prints out the parsed Abstract Syntax Tree (AST) representation in raw JSON.</p>
-          <p style="font-family: 'Fira Code', monospace; margin-top: 1rem; color: var(--primary); font-size: 0.85rem;">node dist/cli.js ast test.bhidu</p>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- Interactive Simulator Script logic -->
+  <script src="app.js"></script>
+  
+  <!-- Interactive Simulator logic -->
   <script>
     const EXAMPLES = {
       hello: {
@@ -829,23 +584,13 @@
           terminalEl.appendChild(lineDiv);
           terminalEl.scrollTop = terminalEl.scrollHeight;
           lineIndex++;
-          setTimeout(printNextLine, 500); // delay next line printing for cool simulator effect
+          setTimeout(printNextLine, 500);
         }
       }
       
       printNextLine();
     }
 
-    function copyInstallCommand() {
-      navigator.clipboard.writeText("npm install -g bhidu-lang");
-      const btn = document.querySelector(".copy-btn");
-      btn.textContent = "Copied!";
-      setTimeout(() => {
-        btn.textContent = "Copy";
-      }, 2000);
-    }
-
-    // Initial load
     window.onload = () => {
       loadExample();
     };
