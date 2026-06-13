@@ -171,7 +171,7 @@ node dist/cli.js repl
 
 ```text
 =========================================
-   Bhidu-Lang Interactive REPL v1.0.0
+   Bhidu-Lang Interactive REPL v1.0.1
    Sab chalta hai bhidu! Type '.exit' to exit.
 =========================================
 chalu kar bhidu

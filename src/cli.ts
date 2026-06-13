@@ -9,7 +9,7 @@ import { Interpreter } from "./interpreter";
 import { Environment } from "./environment";
 import { startDevServer, generateHTML } from "./server";
 
-const version = "1.0.0";
+const version = "1.0.1";
 
 function printHelp() {
   console.log(`
@@ -124,7 +124,32 @@ function runREPL() {
   });
 }
 
-function main() {
+function askQuestion(query: string): Promise<string> {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+  return new Promise((resolve) => {
+    rl.question(query, (answer) => {
+      rl.close();
+      resolve(answer.trim());
+    });
+  });
+}
+
+function getLogoSource(): string | null {
+  const pkgLogo = path.join(__dirname, "..", "docs", "logo.png");
+  if (fs.existsSync(pkgLogo)) {
+    return pkgLogo;
+  }
+  const localLogo = path.resolve("docs/logo.png");
+  if (fs.existsSync(localLogo)) {
+    return localLogo;
+  }
+  return null;
+}
+
+async function main() {
   const args = process.argv.slice(2);
   if (args.length === 0) {
     runREPL();
@@ -187,8 +212,8 @@ khatam bhidu
           if (!fs.existsSync(publicDir)) {
             fs.mkdirSync(publicDir);
           }
-          const logoSrc = path.resolve("docs/logo.png");
-          if (fs.existsSync(logoSrc) && !fs.existsSync(path.join(publicDir, "logo.png"))) {
+          const logoSrc = getLogoSource();
+          if (logoSrc && !fs.existsSync(path.join(publicDir, "logo.png"))) {
             fs.copyFileSync(logoSrc, path.join(publicDir, "logo.png"));
           }
           
@@ -245,20 +270,32 @@ khatam bhidu
       break;
     }
     case "hagde": {
-      console.log(`🛠️ Scaffolding a complete Bhidu project...`);
-      try {
-        const publicDir = path.resolve("public");
-        const componentsDir = path.resolve("components");
-        const pagesDir = path.resolve("pages");
+      let projectName = args[1];
+      if (!projectName) {
+        projectName = await askQuestion("bhidu is project ka naam kya rkhna h wo to bta: ");
+        if (!projectName) {
+          projectName = "bhidu-app";
+        }
+      }
 
+      console.log(`🛠️ Scaffolding a complete Bhidu project inside '${projectName}'...`);
+      try {
+        const projectDir = path.resolve(projectName);
+        const publicDir = path.join(projectDir, "public");
+        const componentsDir = path.join(projectDir, "components");
+        const pagesDir = path.join(projectDir, "pages");
+
+        if (!fs.existsSync(projectDir)) {
+          fs.mkdirSync(projectDir, { recursive: true });
+        }
         if (!fs.existsSync(publicDir)) fs.mkdirSync(publicDir);
         if (!fs.existsSync(componentsDir)) fs.mkdirSync(componentsDir);
         if (!fs.existsSync(pagesDir)) fs.mkdirSync(pagesDir);
 
-        // Copy logo docs/logo.png to public/logo.png
-        const docsLogo = path.resolve("docs/logo.png");
-        if (fs.existsSync(docsLogo)) {
-          fs.copyFileSync(docsLogo, path.join(publicDir, "logo.png"));
+        // Copy logo
+        const logoSrc = getLogoSource();
+        if (logoSrc) {
+          fs.copyFileSync(logoSrc, path.join(publicDir, "logo.png"));
         }
 
         const TEMPLATE_CODE = `chalu kar bhidu
@@ -295,17 +332,17 @@ khatam bhidu
         );
 
         // Create index.bhidu
-        fs.writeFileSync("index.bhidu", TEMPLATE_CODE);
+        fs.writeFileSync(path.join(projectDir, "index.bhidu"), TEMPLATE_CODE);
 
         console.log(`=================================================`);
         console.log(`✨ Bhidu project scaffolded successfully re bhidu!`);
-        console.log(`📁 Created folders: public/, components/, pages/`);
-        console.log(`📄 Created entry: index.bhidu (Home Page)`);
-        console.log(`🖼️ Logo asset ready at: public/logo.png`);
+        console.log(`📁 Created folders inside: ${projectName}/`);
+        console.log(`📄 Created entry: ${projectName}/index.bhidu (Home Page)`);
+        console.log(`🖼️ Logo asset ready at: ${projectName}/public/logo.png`);
         console.log(`=================================================`);
-        console.log(`🚀 Start editing: Edit index.bhidu`);
-        console.log(`👉 Run server: bhidu shuru hoja`);
-        console.log(`👉 Build bundle: bhidu faad de`);
+        console.log(`🚀 Start editing: Edit ${projectName}/index.bhidu`);
+        console.log(`👉 Run server: cd ${projectName} && bhidu shuru hoja`);
+        console.log(`👉 Build bundle: cd ${projectName} && bhidu faad de`);
       } catch (err: any) {
         console.error(`❌ Scaffolding failed: ${err.message || err}`);
         process.exit(1);

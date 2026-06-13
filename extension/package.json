@@ -2,7 +2,7 @@
   "name": "bhidu-vscode",
   "displayName": "Bhidu Lang Support",
   "description": "Syntax highlighting, formatting, and live compiler diagnostics for bhidu-lang",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "publisher": "ghostcompiler",
   "repository": {
     "type": "git",
@@ -24,8 +24,13 @@
     "languages": [
       {
         "id": "bhidu",
-        "aliases": ["Bhidu", "bhidu-lang"],
-        "extensions": [".bhidu"],
+        "aliases": [
+          "Bhidu",
+          "bhidu-lang"
+        ],
+        "extensions": [
+          ".bhidu"
+        ],
         "configuration": "./language-configuration.json"
       }
     ],
