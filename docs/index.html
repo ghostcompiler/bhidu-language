@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>bhidu-lang | Mumbai's Swag-Filled Programming Language</title>
+  <meta name="description" content="A toy programming language written in TypeScript featuring Mumbai's own Jackie Shroff / Bhidu slang keywords. Fully featured with a CLI, AST parser, and REPL.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- CSS Styles -->
+  <style>
+    :root {
+      --bg-color: #07080b;
+      --card-bg: rgba(13, 16, 23, 0.75);
+      --card-border: rgba(142, 228, 63, 0.1);
+      --primary: #8ee43f;
+      --primary-hover: #9bf049;
+      --primary-glow: rgba(142, 228, 63, 0.25);
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --text-accent: #b6f376;
+      --terminal-bg: #050608;
+      --sidebar-width: 280px;
+      --accent-green: #8ee43f;
+      --accent-blue: #29b6f6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      line-height: 1.6;
+      overflow-x: hidden;
+      display: flex;
+      scroll-behavior: smooth;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-color);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary);
+    }
+
+    /* Grid & Layout */
+    aside {
+      width: var(--sidebar-width);
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: rgba(10, 11, 17, 0.95);
+      border-right: 1px solid var(--card-border);
+      padding: 2.5rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+
+    main {
+      margin-left: var(--sidebar-width);
+      width: calc(100% - var(--sidebar-width));
+      padding: 3rem 5%;
+      min-height: 100vh;
+    }
+
+    /* Sidebar Styles */
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 3rem;
+    }
+
+    .logo-img {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      border: 1.5px solid var(--primary);
+      object-fit: cover;
+      box-shadow: 0 0 10px var(--primary-glow);
+    }
+
+    .logo-text {
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text-main);
+    }
+
+    .logo-badge {
+      font-size: 0.65rem;
+      background: var(--primary);
+      color: white;
+      padding: 0.15rem 0.4rem;
+      border-radius: 5px;
+      font-weight: 600;
+      vertical-align: middle;
+      margin-left: 0.3rem;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      flex-grow: 1;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.6rem 0.75rem;
+      border-radius: 8px;
+      transition: all 0.2s ease-in-out;
+    }
+
+    .nav-links a:hover, .nav-links li.active a {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.05);
+      border-left: 3px solid var(--primary);
+      padding-left: calc(0.75rem - 3px);
+    }
+
+    .sidebar-footer {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--card-border);
+      padding-top: 1.5rem;
+    }
+
+    .sidebar-footer a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    /* Section Styles */
+    section {
+      margin-bottom: 5rem;
+      scroll-margin-top: 3rem;
+    }
+
+    h1, h2, h3 {
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    h1 {
+      font-size: 3.5rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(to right, #ffffff, #b6f376);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -1px;
+    }
+
+    h2 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    h2::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 1.5rem;
+      background: var(--primary);
+      border-radius: 2px;
+    }
+
+    p {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      font-size: 1.1rem;
+    }
+
+    /* Banner/Hero */
+    .hero {
+      position: relative;
+      padding: 4rem 0;
+    }
+
+    .hero-tagline {
+      font-size: 1.4rem;
+      color: var(--text-accent);
+      font-weight: 500;
+      margin-bottom: 2rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+    }
+
+    .btn {
+      padding: 0.8rem 1.8rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 4px 15px var(--primary-glow);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+      border: 1px solid var(--card-border);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .copy-install {
+      background: var(--terminal-bg);
+      border: 1px solid var(--card-border);
+      padding: 0.8rem 1.2rem;
+      border-radius: 8px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      display: inline-flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .copy-btn {
+      background: none;
+      border: none;
+      color: var(--primary);
+      cursor: pointer;
+      font-weight: 600;
+      font-family: 'Outfit', sans-serif;
+      transition: color 0.2s;
+    }
+
+    .copy-btn:hover {
+      color: var(--primary-hover);
+    }
+
+    /* Cards */
+    .grid-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(142, 228, 63, 0.3);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 15px rgba(142, 228, 63, 0.05);
+    }
+
+    .card h3 {
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
+      color: var(--text-accent);
+    }
+
+    .card p {
+      font-size: 0.95rem;
+      margin-bottom: 0;
+    }
+
+    .card-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    /* Playground Panel */
+    .playground-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-top: 2rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    @media (max-width: 900px) {
+      .playground-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .editor-pane, .terminal-pane {
+      display: flex;
+      flex-direction: column;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .pane-header {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 500;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .dot-indicators {
+      display: flex;
+      gap: 5px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #ff5f56; }
+    .dot-yellow { background: #ffbd2e; }
+    .dot-green { background: #27c93f; }
+
+    .code-editor {
+      background: #0f1015;
+      padding: 1.25rem;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.9rem;
+      color: #a9b2c3;
+      height: 320px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+
+    .terminal-body {
+      background: var(--terminal-bg);
+      padding: 1.25rem;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.9rem;
+      color: #4caf50;
+      height: 320px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 0.5rem;
+    }
+
+    .terminal-line {
+      min-height: 1.2rem;
+    }
+
+    .terminal-input {
+      color: #ffb74d;
+    }
+
+    .playground-controls {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .selector-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .selector-container label {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    select {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      outline: none;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    select:focus {
+      border-color: var(--primary);
+    }
+
+    /* Dictionary Table */
+    .table-container {
+      overflow-x: auto;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      margin-top: 2rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th, td {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    th {
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text-accent);
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    .badge-keyword {
+      font-family: 'Fira Code', monospace;
+      color: var(--primary);
+      background: rgba(142, 228, 63, 0.15);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .badge-js {
+      font-family: 'Fira Code', monospace;
+      color: var(--accent-blue);
+      background: rgba(33, 150, 243, 0.1);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    /* Syntax Highlighting in Editor */
+    .token-keyword { color: #8ee43f; font-weight: 600; }
+    .token-string { color: #8bc34a; }
+    .token-number { color: #ffb74d; }
+    .token-comment { color: #5c6370; font-style: italic; }
+    .token-ident { color: #61afef; }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      aside {
+        display: none;
+      }
+      main {
+        margin-left: 0;
+        width: 100%;
+        padding: 2rem 5%;
+      }
+      h1 {
+        font-size: 2.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Sidebar -->
+  <aside>
+    <div>
+      <div class="logo-container">
+        <img src="logo.png" alt="logo" class="logo-img">
+        <span class="logo-text">bhidu-lang<span class="logo-badge">v1.0.0</span></span>
+      </div>
+      <ul class="nav-links">
+        <li class="active"><a href="#intro">🏡 Chalu Karte Hai</a></li>
+        <li><a href="#playground">🎮 Playground</a></li>
+        <li><a href="#dictionary">📖 Slang Dictionary</a></li>
+        <li><a href="#syntax">📝 Syntax Guide</a></li>
+        <li><a href="#cli">🛠️ CLI Reference</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-footer">
+      Made for fun by <a href="https://github.com/ghostcompiler" target="_blank">ghostcompiler</a>
+    </div>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main>
+    
+    <!-- Hero Banner -->
+    <section id="intro" class="hero">
+      <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem; flex-wrap: wrap;">
+        <img src="logo.png" alt="logo" style="width: 100px; height: 100px; border-radius: 16px; border: 2.5px solid var(--primary); box-shadow: 0 0 25px var(--primary-glow); object-fit: cover;">
+        <div>
+          <h1>bhidu-lang</h1>
+          <p class="hero-tagline" style="margin-bottom: 0;">Mumbai's own toy programming language, written in TypeScript. Bole toh ekdum solid! 🕶️</p>
+        </div>
+      </div>
+      
+      <p>Ever wanted a programming language that speaks like a true Mumbai local? Inspired by Jackie Shroff's slang, <strong>bhidu-lang</strong> brings variables, loops, conditional scoping, and localized CLI tools to your terminal. Write code, trigger custom slang errors, and explore compilations easily.</p>
+      
+      <div class="hero-actions">
+        <a href="#playground" class="btn btn-primary">🎮 Try Playground</a>
+        <a href="#dictionary" class="btn btn-secondary">📖 View Dictionary</a>
+      </div>
+
+      <div class="copy-install">
+        <span>$ npm install -g bhidu-lang</span>
+        <button class="copy-btn" onclick="copyInstallCommand()">Copy</button>
+      </div>
+    </section>
+
+    <!-- Interactive Simulator / Playground -->
+    <section id="playground">
+      <h2>Interactive Simulator</h2>
+      <p>Select a script below, click <strong>"Chalao Code!"</strong>, and watch the simulated parser run the code node-by-node in the virtual terminal.</p>
+      
+      <div class="playground-container">
+        <!-- virtual editor -->
+        <div class="editor-pane">
+          <div class="pane-header">
+            <div class="dot-indicators">
+              <span class="dot dot-red"></span>
+              <span class="dot dot-yellow"></span>
+              <span class="dot dot-green"></span>
+            </div>
+            <span>editor.bhidu</span>
+          </div>
+          <div id="editor" class="code-editor"></div>
+        </div>
+
+        <!-- virtual terminal -->
+        <div class="terminal-pane">
+          <div class="pane-header">
+            <span>Virtual Console</span>
+          </div>
+          <div id="terminal" class="terminal-body">
+            <div class="terminal-line">Virtual terminal ready. Click "Chalao Code!"</div>
+          </div>
+        </div>
+
+        <!-- controls -->
+        <div class="playground-controls">
+          <div class="selector-container">
+            <label for="example-select">Choose Example:</label>
+            <select id="example-select" onchange="loadExample()">
+              <option value="hello">Hello Bhidu (Print)</option>
+              <option value="variables">Variables & Math</option>
+              <option value="condition">If-Else (Agar-Warna)</option>
+              <option value="loop">Loops & Break (Jab Tak)</option>
+              <option value="error">Slang Error Trigger</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="simulateCode()">Chalao Code! 🚀</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slang Dictionary -->
+    <section id="dictionary">
+      <h2>Slang Keywords</h2>
+      <p>Here is your reference guide to scripting in bhidu-lang. Trade standard JS/TS operators for local slang.</p>
+      
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Bhidu Slang</th>
+              <th>JS Equivalent</th>
+              <th>What it does</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge-keyword">chalu kar bhidu</span></td>
+              <td>*(implicit)*</td>
+              <td>Program opening syntax. Essential at the top of the file!</td>
+            </tr>
+            <tr>
+              <td><span class="badge-keyword">khatam bhidu</span></td>
+              <td>*(implicit)*</td>
+              <td>Program closing syntax. Must close your file with this.</td>
+            </tr>
+            <tr>
+              <td><span class="badge-keyword">bhidu ye hai</span></td>
+              <td><span class="badge-js">let / var</span></td>
+              <td>Declare a variable (e.g. <code>bhidu ye hai counter = 0;</code>)</td>
+            </tr>
+            <tr>
+              <td><span class="badge-keyword">bhidu bolta hai(...)</span></td>
+              <td><span class="badge-js">console.log(...)</span></td>
+              <td>Outputs expressions, variables or calculations to the console.</td>
+            </tr>
+            <tr>
+              <td><span class="badge-keyword">sahi bhidu</span></td>
+              <td><span class="badge-js">true</span></td>
+              <td>Boolean true state.</td>
+            </tr>
+            <tr>
+              <td><span class="badge-keyword">galat bhidu</span></td>
+              <td><span class="badge-js">false</span></td>
+              <td>Boolean false state.</td>
+            </tr>
+            <tr>
+              <td><span class="badge-keyword">khali bhidu</span></td>
+              <td><span class="badge-js">null</span></td>
+              <td>Empty reference or null variable state.</td>
+            </tr>
+            <tr>
+              <td><span class="badge-keyword">agar bhidu(...)</span></td>
+              <td><span class="badge-js">if(...)</span></td>
+              <td>Execute block if condition evaluates to true.</td>
+            </tr>
+            <tr>
+              <td><span class="badge-keyword">warna agar bhidu(...)</span></td>
+              <td><span class="badge-js">else if(...)</span></td>
+              <td>Execute fallback check block.</td>
+            </tr>
+            <tr>
+              <td><span class="badge-keyword">warna bhidu</span></td>
+              <td><span class="badge-js">else</span></td>
+              <td>Default conditional execution block.</td>
+            </tr>
+            <tr>
+              <td><span class="badge-keyword">jab tak bhidu(...)</span></td>
+              <td><span class="badge-js">while(...)</span></td>
+              <td>Iterative block that runs as long as the condition holds.</td>
+            </tr>
+            <tr>
+              <td><span class="badge-keyword">bas kar bhidu</span></td>
+              <td><span class="badge-js">break</span></td>
+              <td>Exits loops immediately.</td>
+            </tr>
+            <tr>
+              <td><span class="badge-keyword">agli baar bhidu</span></td>
+              <td><span class="badge-js">continue</span></td>
+              <td>Skips the current loop step and starts the next iteration.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Syntax Guide -->
+    <section id="syntax">
+      <h2>Syntax Guide</h2>
+      <p>Quick structures to help you get writing in no time.</p>
+      
+      <div class="grid-cards">
+        <div class="card">
+          <div class="card-icon">⚡</div>
+          <h3>Main File Structure</h3>
+          <p>Every file must end with <code>.bhidu</code> and encapsulate statements inside <code>chalu kar bhidu</code> and <code>khatam bhidu</code>.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🔒</div>
+          <h3>Variables & Reassignment</h3>
+          <p>Initialize variables using <code>bhidu ye hai x = 5;</code>. Reassignment doesn't require prefix keywords: <code>x = 10;</code>.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🛠️</div>
+          <h3>Blocks & Scoping</h3>
+          <p>Standard bracket scopes <code>{ ... }</code> isolate variables. Nested blocks support variable shadowing out of the box.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CLI Reference -->
+    <section id="cli">
+      <h2>CLI Commands Reference</h2>
+      <p>How to run, parse, and execute programs from your host terminal once installed.</p>
+      
+      <div class="grid-cards">
+        <div class="card">
+          <h3>bhidu run &lt;file&gt;</h3>
+          <p>Compiles, parses, and executes the target script directly.</p>
+          <p style="font-family: 'Fira Code', monospace; margin-top: 1rem; color: var(--primary); font-size: 0.85rem;">node dist/cli.js run test.bhidu</p>
+        </div>
+        <div class="card">
+          <h3>bhidu repl</h3>
+          <p>Launches interactive shell. Preserve environment states and write line-by-line statements.</p>
+          <p style="font-family: 'Fira Code', monospace; margin-top: 1rem; color: var(--primary); font-size: 0.85rem;">node dist/cli.js repl</p>
+        </div>
+        <div class="card">
+          <h3>bhidu ast &lt;file&gt;</h3>
+          <p>Prints out the parsed Abstract Syntax Tree (AST) representation in raw JSON.</p>
+          <p style="font-family: 'Fira Code', monospace; margin-top: 1rem; color: var(--primary); font-size: 0.85rem;">node dist/cli.js ast test.bhidu</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Interactive Simulator Script logic -->
+  <script>
+    const EXAMPLES = {
+      hello: {
+        code: `<span class="token-keyword">chalu kar bhidu</span>\n  <span class="token-comment">// Apun ka pehla print script</span>\n  <span class="token-keyword">bhidu bolta hai</span>(<span class="token-string">"Bole toh ekdum jhakaas!"</span>);\n<span class="token-keyword">khatam bhidu</span>`,
+        output: [
+          `<span class="terminal-input">bhidu run hello.bhidu</span>`,
+          `Bole toh ekdum jhakaas!`,
+          `[Process finished successfully]`
+        ]
+      },
+      variables: {
+        code: `<span class="token-keyword">chalu kar bhidu</span>\n  <span class="token-keyword">bhidu ye hai</span> a = <span class="token-number">10</span>;\n  <span class="token-keyword">bhidu ye hai</span> b = <span class="token-number">20</span>;\n  <span class="token-keyword">bhidu bolta hai</span>(a + b);\n  <span class="token-keyword">bhidu bolta hai</span>(b - a);\n<span class="token-keyword">khatam bhidu</span>`,
+        output: [
+          `<span class="terminal-input">bhidu run variables.bhidu</span>`,
+          `30`,
+          `10`,
+          `[Process finished successfully]`
+        ]
+      },
+      condition: {
+        code: `<span class="token-keyword">chalu kar bhidu</span>\n  <span class="token-keyword">bhidu ye hai</span> age = <span class="token-number">18</span>;\n  <span class="token-keyword">agar bhidu</span> (age &gt;= <span class="token-number">18</span>) {\n    <span class="token-keyword">bhidu bolta hai</span>(<span class="token-string">"License milega bhidu!"</span>);\n  } <span class="token-keyword">warna bhidu</span> {\n    <span class="token-keyword">bhidu bolta hai</span>(<span class="token-string">"Chhota hai re tu!"</span>);\n  }\n<span class="token-keyword">khatam bhidu</span>`,
+        output: [
+          `<span class="terminal-input">bhidu run condition.bhidu</span>`,
+          `License milega bhidu!`,
+          `[Process finished successfully]`
+        ]
+      },
+      loop: {
+        code: `<span class="token-keyword">chalu kar bhidu</span>\n  <span class="token-keyword">bhidu ye hai</span> count = <span class="token-number">0</span>;\n  <span class="token-keyword">jab tak bhidu</span> (count &lt; <span class="token-number">4</span>) {\n    count = count + <span class="token-number">1</span>;\n    <span class="token-keyword">agar bhidu</span> (count == <span class="token-number">3</span>) {\n      <span class="token-keyword">bhidu bolta hai</span>(<span class="token-string">"Apun half rasta pe hai!"</span>);\n      <span class="token-keyword">agli baar bhidu</span>;\n    }\n    <span class="token-keyword">bhidu bolta hai</span>(count);\n  }\n<span class="token-keyword">khatam bhidu</span>`,
+        output: [
+          `<span class="terminal-input">bhidu run loop.bhidu</span>`,
+          `1`,
+          `2`,
+          `Apun half rasta pe hai!`,
+          `4`,
+          `[Process finished successfully]`
+        ]
+      },
+      error: {
+        code: `<span class="token-keyword">chalu kar bhidu</span>\n  <span class="token-comment">// Division by zero will trigger slang error</span>\n  <span class="token-keyword">bhidu ye hai</span> a = <span class="token-number">10</span> / <span class="token-number">0</span>;\n<span class="token-keyword">khatam bhidu</span>`,
+        output: [
+          `<span class="terminal-input">bhidu run error.bhidu</span>`,
+          `<span style="color: #f44336;">Kya re bhidu! Line 3 pe error: Zero (0) se divide kar raha hai? Dhandha bandh karwayega kya!</span>`,
+          `<span style="color: #f44336;">[Process failed with exit code 1]</span>`
+        ]
+      }
+    };
+
+    const editorEl = document.getElementById("editor");
+    const terminalEl = document.getElementById("terminal");
+    const selectEl = document.getElementById("example-select");
+
+    function loadExample() {
+      const selected = selectEl.value;
+      const data = EXAMPLES[selected];
+      editorEl.innerHTML = data.code;
+      terminalEl.innerHTML = `<div class="terminal-line">Virtual terminal ready. Click "Chalao Code!"</div>`;
+    }
+
+    function simulateCode() {
+      const selected = selectEl.value;
+      const data = EXAMPLES[selected];
+      
+      terminalEl.innerHTML = "";
+      let lineIndex = 0;
+
+      function printNextLine() {
+        if (lineIndex < data.output.length) {
+          const lineDiv = document.createElement("div");
+          lineDiv.className = "terminal-line";
+          lineDiv.innerHTML = data.output[lineIndex];
+          terminalEl.appendChild(lineDiv);
+          terminalEl.scrollTop = terminalEl.scrollHeight;
+          lineIndex++;
+          setTimeout(printNextLine, 500); // delay next line printing for cool simulator effect
+        }
+      }
+      
+      printNextLine();
+    }
+
+    function copyInstallCommand() {
+      navigator.clipboard.writeText("npm install -g bhidu-lang");
+      const btn = document.querySelector(".copy-btn");
+      btn.textContent = "Copied!";
+      setTimeout(() => {
+        btn.textContent = "Copy";
+      }, 2000);
+    }
+
+    // Initial load
+    window.onload = () => {
+      loadExample();
+    };
+  </script>
+</body>
+</html>

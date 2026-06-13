@@ -1,0 +1,29 @@
+{
+  "name": "bhidu-lang",
+  "version": "1.0.0",
+  "description": "A toy programming language written in TypeScript with Mumbai slang",
+  "main": "dist/cli.js",
+  "bin": {
+    "bhidu": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "dev": "ts-node src/cli.ts"
+  },
+  "keywords": [
+    "bhidu",
+    "language",
+    "toy",
+    "interpreter",
+    "parser"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3",
+    "vitest": "^1.3.1"
+  }
+}

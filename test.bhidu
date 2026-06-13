@@ -1,0 +1,29 @@
+chalu kar bhidu
+
+// Variable declaration and assignments
+bhidu ye hai naam = "Jackie Shroff";
+bhidu ye hai age = 69;
+bhidu ye hai isLegend = sahi bhidu;
+
+bhidu bolta hai("Naam: " + naam);
+bhidu bolta hai("Umar: " + age);
+bhidu bolta hai("Legend hai kya? ");
+bhidu bolta hai(isLegend);
+
+// Calculations
+bhidu ye hai a = 5;
+bhidu ye hai b = 10;
+bhidu bolta hai("a + b = " + (a + b));
+
+// Loop and if-else
+bhidu ye hai counter = 0;
+jab tak bhidu (counter < 5) {
+  counter = counter + 1;
+  agar bhidu (counter % 2 == 0) {
+    bhidu bolta hai("Even counter: " + counter);
+  } warna bhidu {
+    bhidu bolta hai("Odd counter: " + counter);
+  }
+}
+
+khatam bhidu
