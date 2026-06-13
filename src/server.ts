@@ -6,6 +6,32 @@ import { Parser } from "./parser";
 import { Compiler } from "./compiler";
 
 /**
+ * Recursively walks the project directory to collect all CSS file contents.
+ */
+function collectCSS(dir: string): string {
+  let styles = "";
+  if (!fs.existsSync(dir)) return styles;
+
+  function walk(currentDir: string) {
+    const files = fs.readdirSync(currentDir);
+    for (const file of files) {
+      const fullPath = path.join(currentDir, file);
+      const stat = fs.statSync(fullPath);
+      if (stat.isDirectory()) {
+        if (file !== "node_modules" && file !== ".git" && file !== "out" && file !== "dist") {
+          walk(fullPath);
+        }
+      } else if (stat.isFile() && file.endsWith(".css")) {
+        styles += `/* --- Component: ${path.relative(dir, fullPath)} --- */\n`;
+        styles += fs.readFileSync(fullPath, "utf-8") + "\n\n";
+      }
+    }
+  }
+  walk(dir);
+  return styles;
+}
+
+/**
  * Generates the full HTML wrapper for the compiled JS code.
  */
 export function generateHTML(entryPath: string, isDev: boolean): string {
@@ -21,7 +47,10 @@ export function generateHTML(entryPath: string, isDev: boolean): string {
     const compiler = new Compiler();
     const jsCode = compiler.compile(ast);
 
-    return getSuccessTemplate(jsCode, isDev);
+    const projectDir = path.dirname(entryPath);
+    const componentStyles = collectCSS(projectDir);
+
+    return getSuccessTemplate(jsCode, isDev, componentStyles);
   } catch (error: any) {
     return getErrorTemplate(error.message || String(error), isDev);
   }
@@ -30,7 +59,7 @@ export function generateHTML(entryPath: string, isDev: boolean): string {
 /**
  * HTML template for successful compilation.
  */
-function getSuccessTemplate(jsCode: string, isDev: boolean): string {
+function getSuccessTemplate(jsCode: string, isDev: boolean, componentStyles = ""): string {
   const hotReloadScript = isDev
     ? `
     <script>
@@ -103,6 +132,9 @@ function getSuccessTemplate(jsCode: string, isDev: boolean): string {
       to { opacity: 1; transform: translateY(0); }
     }
   </style>
+  <style id="bhidu-component-styles">
+    ${componentStyles}
+  </style>
 </head>
 <body>
   <div class="app-container">
@@ -111,6 +143,10 @@ function getSuccessTemplate(jsCode: string, isDev: boolean): string {
   </div>
 
   <script>
+    // Reactive State & Component CSS System Runtime
+    const effectStore = [];
+    let effectIndex = 0;
+
     function bhiduRender(val) {
       const container = document.getElementById("bhidu-root");
       if (!container) return;
@@ -124,8 +160,8 @@ function getSuccessTemplate(jsCode: string, isDev: boolean): string {
       if (val === true) output = "sahi bhidu";
       if (val === false) output = "galat bhidu";
 
-      // If output is string and contains HTML tags, render it as innerHTML
-      if (typeof output === "string" && /<[a-z][\\s\\S]*>/i.test(output)) {
+      // If output is string and contains HTML tags (including closing tags like </div >), render as innerHTML
+      if (typeof output === "string" && /<[a-z0-9\\/!]/i.test(output)) {
         div.innerHTML = output;
       } else {
         div.textContent = String(output);
@@ -134,13 +170,43 @@ function getSuccessTemplate(jsCode: string, isDev: boolean): string {
       container.appendChild(div);
     }
 
-    // Execute compiled bhidu code
-    try {
-      ${jsCode}
-    } catch (err) {
-      console.error("Runtime error in bhidu code:", err);
-      bhiduRender('<span style="color: #ff5252; font-weight: bold;">[Runtime Lafda]: ' + err.message + '</span>');
-    }
+    // Rerender trigger helper
+    window.bhiduReRender = function() {
+      effectIndex = 0;
+      const container = document.getElementById("bhidu-root");
+      if (container) container.innerHTML = "";
+      
+      try {
+        ${jsCode}
+      } catch (err) {
+        console.error("Runtime error in bhidu code:", err);
+        bhiduRender('<span style="color: #ff5252; font-weight: bold;">[Runtime Lafda]: ' + err.message + '</span>');
+      }
+    };
+
+    // State updater
+    window.bhiduSetState = function(name, val) {
+      window[name] = val;
+      window.bhiduReRender();
+    };
+
+    // useEffect hook replacement
+    window.bhiduEffect = function(callback, deps) {
+      const oldDeps = effectStore[effectIndex];
+      let hasChanged = true;
+      if (oldDeps && deps) {
+        hasChanged = deps.some((dep, i) => dep !== oldDeps[i]);
+      }
+      if (hasChanged) {
+        effectStore[effectIndex] = deps;
+        // Schedule effect run asynchronously after rendering finishes
+        setTimeout(callback, 0);
+      }
+      effectIndex++;
+    };
+
+    // Initial render
+    window.bhiduReRender();
   </script>
   ${hotReloadScript}
 </body>

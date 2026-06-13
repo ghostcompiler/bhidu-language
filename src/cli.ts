@@ -9,7 +9,7 @@ import { Interpreter } from "./interpreter";
 import { Environment } from "./environment";
 import { startDevServer, generateHTML } from "./server";
 
-const version = "1.0.1";
+const version = "1.0.2";
 
 function printHelp() {
   console.log(`
@@ -299,10 +299,21 @@ khatam bhidu
         }
 
         const TEMPLATE_CODE = `chalu kar bhidu
+  // Auto-scaffolded reactive state count variable
+  bhidu ye hai count = 0;
+
   bhidu bolta hai("<div style='text-align: center; padding: 4rem 2rem; max-width: 600px; margin: 0 auto;'>");
   bhidu bolta hai("  <img src='logo.png' alt='logo' style='width: 120px; height: 120px; border-radius: 20px; margin-bottom: 2rem; border: 3px solid #8ee43f; box-shadow: 0 0 35px rgba(142, 228, 63, 0.4); object-fit: cover;'>");
   bhidu bolta hai("  <h1 style='font-size: 3.2rem; font-weight: 800; background: linear-gradient(135deg, #ffffff 40%, #8ee43f); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-top: 0; margin-bottom: 0.5rem; letter-spacing: -1px;'>Bhidu App</h1>");
-  bhidu bolta hai("  <p style='font-size: 1.25rem; color: #9ca3af; margin-bottom: 3rem; line-height: 1.6; max-width: 500px; margin-left: auto; margin-right: auto;'>Bole toh ekdum solid local web app re bhidu! HTML preview is fully ready on localhost. 🕶️</p>");
+  bhidu bolta hai("  <p style='font-size: 1.25rem; color: #9ca3af; margin-bottom: 2.5rem; line-height: 1.6;'>Bole toh ekdum solid local web app re bhidu! HTML preview is fully ready on localhost. 🕶️</p>");
+
+  // Counter UI with custom class from public/styles.css
+  bhidu bolta hai("  <div style='background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 2rem; margin-bottom: 2.5rem;'>");
+  bhidu bolta hai("    <h3 style='color: #8ee43f; margin-top: 0; margin-bottom: 0.75rem; font-size: 1.2rem;'>⚡ Reactive State</h3>");
+  bhidu bolta hai("    <p style='color: #f3f4f6; font-size: 1.4rem; font-weight: bold; margin: 0;'>Count: " + count + "</p>");
+  bhidu bolta hai("    <button class='bhidu-button' onclick=\\"bhiduSetState('count', count + 1)\\">Increment count</button>");
+  bhidu bolta hai("  </div>");
+
   bhidu bolta hai("  <div style='display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; text-align: left; max-width: 800px; width: 100%; margin: 0 auto 3rem;'>");
   bhidu bolta hai("    <div style='background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 1.5rem;'>");
   bhidu bolta hai("      <h3 style='color: #8ee43f; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.15rem;'>📁 Get Started</h3>");
@@ -313,12 +324,38 @@ khatam bhidu
   bhidu bolta hai("      <p style='color: #9ca3af; font-size: 0.95rem; margin: 0; line-height: 1.5;'>Check out the compiler code and give it a star: <a href=\\"https://github.com/ghostcompiler/bhidu-language\\" target=\\"_blank\\" style='color: #8ee43f; text-decoration: none; font-weight: 600;'>ghostcompiler/bhidu-language</a></p>");
   bhidu bolta hai("    </div>");
   bhidu bolta hai("  </div>");
+
   bhidu bolta hai("  <div style='display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;'>");
   bhidu bolta hai("    <span style='font-family: monospace; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; color: #b6f376;'>dev: bhidu shuru hoja</span>");
   bhidu bolta hai("    <span style='font-family: monospace; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; color: #b6f376;'>build: bhidu faad de</span>");
   bhidu bolta hai("  </div>");
   bhidu bolta hai("</div>");
 khatam bhidu
+`;
+
+        const TEMPLATE_CSS = `/* Bhidu App Component Styles */
+.bhidu-button {
+  background: linear-gradient(135deg, #8ee43f, #76c92d);
+  color: #07080b;
+  border: none;
+  padding: 0.6rem 1.4rem;
+  font-size: 0.95rem;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(142, 228, 63, 0.25);
+  transition: all 0.2s ease-in-out;
+  margin-top: 1rem;
+}
+
+.bhidu-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(142, 228, 63, 0.45);
+}
+
+.bhidu-button:active {
+  transform: translateY(1px);
+}
 `;
 
         // Create READMEs
@@ -330,6 +367,9 @@ khatam bhidu
           path.join(pagesDir, "README.md"),
           `# Pages Folder\n\nPlace your page scripts and routing resources here re bhidu!\n`
         );
+
+        // Create default styles.css inside public/
+        fs.writeFileSync(path.join(publicDir, "styles.css"), TEMPLATE_CSS);
 
         // Create index.bhidu
         fs.writeFileSync(path.join(projectDir, "index.bhidu"), TEMPLATE_CODE);

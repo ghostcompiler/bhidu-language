@@ -19,11 +19,11 @@ export class Compiler {
 
       case "VarDec": {
         const initVal = node.init !== null ? this.compileNode(node.init) : "null";
-        return `let ${node.id} = ${initVal};`;
+        return `window.${node.id} = window.${node.id} !== undefined ? window.${node.id} : ${initVal};`;
       }
 
       case "Assignment":
-        return `${node.id} = ${this.compileNode(node.value)};`;
+        return `window.${node.id} = ${this.compileNode(node.value)};`;
 
       case "Print": {
         const arg = this.compileNode(node.arguments[0]);
@@ -69,7 +69,7 @@ export class Compiler {
         return String(node.value);
 
       case "Identifier":
-        return node.name;
+        return `window.${node.name}`;
 
       case "BinaryExpression":
         return `(${this.compileNode(node.left)} ${node.operator} ${this.compileNode(node.right)})`;

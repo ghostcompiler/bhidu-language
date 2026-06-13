@@ -188,7 +188,7 @@ node dist/cli.js repl
 
 ```text
 =========================================
-   Bhidu-Lang Interactive REPL v1.0.1
+   Bhidu-Lang Interactive REPL v1.0.2
    Sab chalta hai bhidu! Type '.exit' to exit.
 =========================================
 chalu kar bhidu
@@ -243,6 +243,12 @@ You can bootstrap, build, and run interactive web applications inside the browse
   - Generates a standalone production output folder named `out/` (e.g. `out/index.html`).
   - Recursively copies all static assets from `public/` into `out/` (e.g. copying `public/logo.png` to `out/logo.png`), making the build ready to deploy to GitHub Pages, Netlify, Vercel, or any static provider.
 
+#### ⚡ Reactive State & Effects
+The Bhidu Web Framework features a built-in client-side reactive state and side-effects system:
+* **Reactive State**: Any variable declared using `bhidu ye hai` maintains state across page renders. You can trigger updates and re-renders by calling `bhiduSetState('variableName', newValue)` inside your HTML handlers (e.g. `onclick`).
+* **Reactive Effects**: Run side effects using `bhiduEffect(callback, dependencies)` inside your code (similar to React's `useEffect`).
+* **Component CSS Auto-Bundling**: Any `.css` stylesheet files placed in your project directories (`public/`, `components/`, or `pages/`) are automatically detected, bundled, and injected directly into the compiled HTML page's `<head>`.
+
 ---
 
 ## 💻 VS Code IDE Extension
@@ -255,7 +261,7 @@ You can bootstrap, build, and run interactive web applications inside the browse
 ### Install Extension
 Install the extension package from the workspace root:
 ```bash
-code --install-extension extension/bhidu-vscode-1.0.1.vsix
+code --install-extension extension/bhidu-vscode-1.0.2.vsix
 ```
 
 ---
