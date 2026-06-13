@@ -3,3 +3,9 @@ dist
 .DS_Store
 *.log
 *.vsix
+out
+nano
+public/
+components/
+pages/
+index.bhidu

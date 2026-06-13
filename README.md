@@ -1,23 +1,15 @@
-<p align="center">
-  <img src="https://res.cloudinary.com/djgvfl1tv/image/upload/v1780666791/logo_mqnqn4.png" alt="bhidu-lang logo" width="180">
-</p>
 
-<h1 align="center">bhidu-lang</h1>
 
-<p align="center">
-  A premium, feature-rich toy programming language written in TypeScript with Mumbai local slang, featuring a custom lexer, recursive-descent parser, nested environment scoping, CLI, and an interactive REPL.
-</p>
+# Bhidu Language
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Node.js-18%20%7C%2020%20%7C%2022-339933?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js">
-  <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript">
-  <img src="https://img.shields.io/badge/Bhidu--Lang-Interpreter-8ee43f?style=for-the-badge" alt="Bhidu Lang">
-  <img src="https://img.shields.io/badge/Built%20By-Ghost%20Compiler-0F172A?style=for-the-badge" alt="Ghost Compiler">
-</p>
+A premium, feature-rich toy programming language written in TypeScript with Mumbai local slang, featuring a custom lexer, recursive-descent parser, nested environment scoping, CLI, and an interactive REPL.
+
+
 
 ---
 
 ## 📜 Table of Contents
+
 - [Features](#-features)
 - [Keywords Dictionary](#-keywords-dictionary)
 - [Syntax Guide](#-syntax-guide)
@@ -35,6 +27,7 @@
 ---
 
 ## ⚡ Features
+
 - **Slang syntax**: Fully custom slang parser (e.g., `chalu kar bhidu` for entry, `bas kar bhidu` for break).
 - **Interactive REPL**: Write and evaluate statements line-by-line using a persistent environment scope.
 - **Nested Scoping**: Declare shadowing variables inside loops or custom blocks `{ ... }`.
@@ -44,28 +37,32 @@
 
 ## 📖 Keywords Dictionary
 
-| Bhidu Slang | JS/TS Equivalent | Description |
-| :--- | :--- | :--- |
-| `chalu kar bhidu` | *(entry)* | Start of the program |
-| `khatam bhidu` | *(exit)* | End of the program |
-| `bhidu ye hai` | `let` / `var` | Variable declaration |
-| `sahi bhidu` | `true` | Boolean True |
-| `galat bhidu` | `false` | Boolean False |
-| `khali bhidu` | `null` | Null/empty value |
-| `bhidu bolta hai(...)` | `console.log(...)` | Print to stdout |
-| `agar bhidu(...)` | `if(...)` | Conditional Block |
-| `warna agar bhidu(...)` | `else if(...)` | Else If Block |
-| `warna bhidu` | `else` | Else Block |
-| `jab tak bhidu(...)` | `while(...)` | Loop Block |
-| `bas kar bhidu` | `break` | Exit loop immediately |
-| `agli baar bhidu` | `continue` | Skip to the next loop iteration |
+
+| Bhidu Slang             | JS/TS Equivalent   | Description                     |
+| ----------------------- | ------------------ | ------------------------------- |
+| `chalu kar bhidu`       | *(entry)*          | Start of the program            |
+| `khatam bhidu`          | *(exit)*           | End of the program              |
+| `bhidu ye hai`          | `let` / `var`      | Variable declaration            |
+| `sahi bhidu`            | `true`             | Boolean True                    |
+| `galat bhidu`           | `false`            | Boolean False                   |
+| `khali bhidu`           | `null`             | Null/empty value                |
+| `bhidu bolta hai(...)`  | `console.log(...)` | Print to stdout                 |
+| `agar bhidu(...)`       | `if(...)`          | Conditional Block               |
+| `warna agar bhidu(...)` | `else if(...)`     | Else If Block                   |
+| `warna bhidu`           | `else`             | Else Block                      |
+| `jab tak bhidu(...)`    | `while(...)`       | Loop Block                      |
+| `bas kar bhidu`         | `break`            | Exit loop immediately           |
+| `agli baar bhidu`       | `continue`         | Skip to the next loop iteration |
+
 
 ---
 
 ## 📝 Syntax Guide
 
 ### Variables
+
 Declare variables using `bhidu ye hai` and assign values using `=`. Semicolons are mandatory re bhidu!
+
 ```bhidu
 chalu kar bhidu
   bhidu ye hai naam = "Jackie Shroff";
@@ -75,7 +72,9 @@ khatam bhidu
 ```
 
 ### Control Flow
+
 Supports `agar bhidu` (if), `warna agar bhidu` (else if), and `warna bhidu` (else) blocks:
+
 ```bhidu
 chalu kar bhidu
   bhidu ye hai temper = 90;
@@ -90,7 +89,9 @@ khatam bhidu
 ```
 
 ### Loops
+
 Supports while loop `jab tak bhidu` with loop control keywords `bas kar bhidu` (break) and `agli baar bhidu` (continue):
+
 ```bhidu
 chalu kar bhidu
   bhidu ye hai i = 0;
@@ -105,7 +106,9 @@ khatam bhidu
 ```
 
 ### Printing
+
 Print strings, variables, or expressions to the console using `bhidu bolta hai(...)`:
+
 ```bhidu
 chalu kar bhidu
   bhidu bolta hai("Apun ka code mast chalta hai!");
@@ -117,6 +120,7 @@ khatam bhidu
 ## 🛠️ Installation
 
 Clone the repository and install dependencies:
+
 ```bash
 git clone https://github.com/your-username/bhidu-lang.git
 cd bhidu-lang
@@ -124,6 +128,7 @@ npm install
 ```
 
 Build the compiler:
+
 ```bash
 npm run build
 ```
@@ -135,7 +140,9 @@ npm run build
 Once globally installed (`npm install -g bhidu-lang`) or linked locally (`npm link`), you can execute `bhidu` directly from anywhere in your terminal.
 
 ### 1. Running a `.bhidu` Script
+
 Write your code inside a `.bhidu` file (e.g. `program.bhidu`) and execute it directly:
+
 ```bash
 # Global execution
 bhidu run program.bhidu
@@ -149,7 +156,9 @@ npx ts-node src/cli.ts run program.bhidu
 ```
 
 ### 2. Interactive REPL (Slang Shell)
+
 Enter the interactive playground shell to run statements line-by-line:
+
 ```bash
 # Global execution
 bhidu repl
@@ -159,6 +168,7 @@ bhidu
 # Local development execution
 node dist/cli.js repl
 ```
+
 ```text
 =========================================
    Bhidu-Lang Interactive REPL v1.0.0
@@ -173,7 +183,9 @@ khatam bhidu
 ```
 
 ### 3. Debugging the AST (Abstract Syntax Tree)
+
 Parse your slang code and print the compiled JSON AST nodes for debugging:
+
 ```bash
 # Global execution
 bhidu ast program.bhidu
@@ -182,10 +194,33 @@ bhidu ast program.bhidu
 node dist/cli.js ast program.bhidu
 ```
 
+### 4. Web App Mode (Next.js-style Dev & Build)
+
+You can build and run interactive web pages inside your browser using `.bhidu` slang code!
+
+- **Start Hot-Reloading Dev Server**:
+  ```bash
+  bhidu shuru hoja [file.bhidu]
+  ```
+  - Launches a local development server at `http://localhost:3000`.
+  - If no file is specified, it defaults to `index.bhidu` (and creates a starter template automatically if it doesn't exist).
+  - Listens for file changes and **automatically reloads the browser** (Hot Refresh) on file save.
+  - If your code has syntax or tokenizer errors, it renders a custom Next.js-style **Red Screen Slang Error Overlay** displaying error traces in Mumbai local slang!
+  - `bhidu bolta hai("<html>")` automatically renders as live HTML on the page!
+- **Compile & Bundle for Production**:
+  ```bash
+  bhidu faad de [file.bhidu]
+  ```
+  - Transpiles `.bhidu` code to standard HTML & JS.
+  - Generates a standalone, dependency-free static build folder named `out/` (e.g. `out/index.html`), ready to be served on GitHub Pages, Netlify, or anywhere else.
+
 ---
 
 ## 🧪 Testing
+
 Run the automated test suite powered by **Vitest**:
+
 ```bash
 npm run test
 ```
+

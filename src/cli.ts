@@ -7,6 +7,7 @@ import { tokenize } from "./lexer";
 import { Parser } from "./parser";
 import { Interpreter } from "./interpreter";
 import { Environment } from "./environment";
+import { startDevServer, generateHTML } from "./server";
 
 const version = "1.0.0";
 
@@ -18,10 +19,12 @@ function printHelp() {
     bhidu run <file.bhidu>    Execute a .bhidu file
     bhidu ast <file.bhidu>    Print the Abstract Syntax Tree (AST) of a file
     bhidu repl                Start the interactive REPL
+    bhidu shuru hoja [file]   Start the live-reloading Dev Server (default: index.bhidu)
+    bhidu faad de [file]      Compile project to a static HTML page in out/ (default: index.bhidu)
     bhidu help                Show this help message
     
   Example:
-    bhidu run hello.bhidu
+    bhidu shuru hoja
   `);
 }
 
@@ -147,6 +150,168 @@ function main() {
     case "repl":
       runREPL();
       break;
+    case "shuru": {
+      if (args[1] !== "hoja") {
+        console.error("Kya re bhidu! 'shuru' ke baad 'hoja' likhna bhool gaya? Usage: bhidu shuru hoja [file.bhidu]");
+        process.exit(1);
+      }
+      const devFile = args[2] || "index.bhidu";
+      const TEMPLATE_CODE = `chalu kar bhidu
+  bhidu bolta hai("<div style='text-align: center; padding: 4rem 2rem; max-width: 600px; margin: 0 auto;'>");
+  bhidu bolta hai("  <img src='logo.png' alt='logo' style='width: 120px; height: 120px; border-radius: 20px; margin-bottom: 2rem; border: 3px solid #8ee43f; box-shadow: 0 0 35px rgba(142, 228, 63, 0.4); object-fit: cover;'>");
+  bhidu bolta hai("  <h1 style='font-size: 3.2rem; font-weight: 800; background: linear-gradient(135deg, #ffffff 40%, #8ee43f); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-top: 0; margin-bottom: 0.5rem; letter-spacing: -1px;'>Bhidu App</h1>");
+  bhidu bolta hai("  <p style='font-size: 1.25rem; color: #9ca3af; margin-bottom: 3rem; line-height: 1.6; max-width: 500px; margin-left: auto; margin-right: auto;'>Bole toh ekdum solid local web app re bhidu! HTML preview is fully ready on localhost. 🕶️</p>");
+  bhidu bolta hai("  <div style='display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; text-align: left; max-width: 800px; width: 100%; margin: 0 auto 3rem;'>");
+  bhidu bolta hai("    <div style='background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 1.5rem;'>");
+  bhidu bolta hai("      <h3 style='color: #8ee43f; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.15rem;'>📁 Get Started</h3>");
+  bhidu bolta hai("      <p style='color: #9ca3af; font-size: 0.95rem; margin: 0; line-height: 1.5;'>Start editing <strong>index.bhidu</strong> or place files inside <strong>pages/</strong> to see changes refresh.</p>");
+  bhidu bolta hai("    </div>");
+  bhidu bolta hai("    <div style='background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 1.5rem;'>");
+  bhidu bolta hai("      <h3 style='color: #8ee43f; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.15rem;'>🔗 GitHub Repo</h3>");
+  bhidu bolta hai("      <p style='color: #9ca3af; font-size: 0.95rem; margin: 0; line-height: 1.5;'>Check out the compiler code and give it a star: <a href=\\"https://github.com/ghostcompiler/bhidu-language\\" target=\\"_blank\\" style='color: #8ee43f; text-decoration: none; font-weight: 600;'>ghostcompiler/bhidu-language</a></p>");
+  bhidu bolta hai("    </div>");
+  bhidu bolta hai("  </div>");
+  bhidu bolta hai("  <div style='display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;'>");
+  bhidu bolta hai("    <span style='font-family: monospace; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; color: #b6f376;'>dev: bhidu shuru hoja</span>");
+  bhidu bolta hai("    <span style='font-family: monospace; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; color: #b6f376;'>build: bhidu faad de</span>");
+  bhidu bolta hai("  </div>");
+  bhidu bolta hai("</div>");
+khatam bhidu
+`;
+
+        if (!fs.existsSync(devFile)) {
+          console.log(`⚠️ '${devFile}' file nahi mili. Apun ek basic index.bhidu bana raha hai re!`);
+          
+          // Generate public directory and copy logo if not exists
+          const publicDir = path.resolve("public");
+          if (!fs.existsSync(publicDir)) {
+            fs.mkdirSync(publicDir);
+          }
+          const logoSrc = path.resolve("docs/logo.png");
+          if (fs.existsSync(logoSrc) && !fs.existsSync(path.join(publicDir, "logo.png"))) {
+            fs.copyFileSync(logoSrc, path.join(publicDir, "logo.png"));
+          }
+          
+          fs.writeFileSync(devFile, TEMPLATE_CODE);
+        }
+        startDevServer(devFile, 3000);
+      }
+      break;
+    case "faad": {
+      if (args[1] !== "de") {
+        console.error("Kya re bhidu! 'faad' ke baad 'de' likhna bhool gaya? Usage: bhidu faad de [file.bhidu]");
+        process.exit(1);
+      }
+      const buildFile = args[2] || "index.bhidu";
+      if (!fs.existsSync(buildFile)) {
+        console.error(`Kya re bhidu! Build file '${buildFile}' mil hi nahi rahi!`);
+        process.exit(1);
+      }
+      
+      console.log(`⚙️ Building project from '${buildFile}'...`);
+      try {
+        const buildHtml = generateHTML(buildFile, false);
+        const outDir = path.resolve("out");
+        if (!fs.existsSync(outDir)) {
+          fs.mkdirSync(outDir);
+        }
+        
+        fs.writeFileSync(path.join(outDir, "index.html"), buildHtml);
+        
+        // Copy logo from public/ to out/ if exists
+        const publicLogo = path.join("public", "logo.png");
+        if (fs.existsSync(publicLogo)) {
+          fs.copyFileSync(publicLogo, path.join(outDir, "logo.png"));
+        } else {
+          // Fallback: copy from docs/logo.png
+          const docsLogo = path.resolve("docs/logo.png");
+          if (fs.existsSync(docsLogo)) {
+            fs.copyFileSync(docsLogo, path.join(outDir, "logo.png"));
+          }
+        }
+
+        // Copy entire public/ folder to out/ recursively if it exists
+        const publicDir = path.resolve("public");
+        if (fs.existsSync(publicDir)) {
+          fs.cpSync(publicDir, outDir, { recursive: true });
+        }
+        
+        console.log(`✨ Project compiled and built successfully inside out/!`);
+        console.log(`📁 View production output: out/index.html`);
+      } catch (err: any) {
+        console.error(`❌ Build failure: ${err.message || err}`);
+        process.exit(1);
+      }
+      break;
+    }
+    case "hagde": {
+      console.log(`🛠️ Scaffolding a complete Bhidu project...`);
+      try {
+        const publicDir = path.resolve("public");
+        const componentsDir = path.resolve("components");
+        const pagesDir = path.resolve("pages");
+
+        if (!fs.existsSync(publicDir)) fs.mkdirSync(publicDir);
+        if (!fs.existsSync(componentsDir)) fs.mkdirSync(componentsDir);
+        if (!fs.existsSync(pagesDir)) fs.mkdirSync(pagesDir);
+
+        // Copy logo docs/logo.png to public/logo.png
+        const docsLogo = path.resolve("docs/logo.png");
+        if (fs.existsSync(docsLogo)) {
+          fs.copyFileSync(docsLogo, path.join(publicDir, "logo.png"));
+        }
+
+        const TEMPLATE_CODE = `chalu kar bhidu
+  bhidu bolta hai("<div style='text-align: center; padding: 4rem 2rem; max-width: 600px; margin: 0 auto;'>");
+  bhidu bolta hai("  <img src='logo.png' alt='logo' style='width: 120px; height: 120px; border-radius: 20px; margin-bottom: 2rem; border: 3px solid #8ee43f; box-shadow: 0 0 35px rgba(142, 228, 63, 0.4); object-fit: cover;'>");
+  bhidu bolta hai("  <h1 style='font-size: 3.2rem; font-weight: 800; background: linear-gradient(135deg, #ffffff 40%, #8ee43f); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-top: 0; margin-bottom: 0.5rem; letter-spacing: -1px;'>Bhidu App</h1>");
+  bhidu bolta hai("  <p style='font-size: 1.25rem; color: #9ca3af; margin-bottom: 3rem; line-height: 1.6; max-width: 500px; margin-left: auto; margin-right: auto;'>Bole toh ekdum solid local web app re bhidu! HTML preview is fully ready on localhost. 🕶️</p>");
+  bhidu bolta hai("  <div style='display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; text-align: left; max-width: 800px; width: 100%; margin: 0 auto 3rem;'>");
+  bhidu bolta hai("    <div style='background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 1.5rem;'>");
+  bhidu bolta hai("      <h3 style='color: #8ee43f; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.15rem;'>📁 Get Started</h3>");
+  bhidu bolta hai("      <p style='color: #9ca3af; font-size: 0.95rem; margin: 0; line-height: 1.5;'>Start editing <strong>index.bhidu</strong> or place files inside <strong>pages/</strong> to see changes refresh.</p>");
+  bhidu bolta hai("    </div>");
+  bhidu bolta hai("    <div style='background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 1.5rem;'>");
+  bhidu bolta hai("      <h3 style='color: #8ee43f; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.15rem;'>🔗 GitHub Repo</h3>");
+  bhidu bolta hai("      <p style='color: #9ca3af; font-size: 0.95rem; margin: 0; line-height: 1.5;'>Check out the compiler code and give it a star: <a href=\\"https://github.com/ghostcompiler/bhidu-language\\" target=\\"_blank\\" style='color: #8ee43f; text-decoration: none; font-weight: 600;'>ghostcompiler/bhidu-language</a></p>");
+  bhidu bolta hai("    </div>");
+  bhidu bolta hai("  </div>");
+  bhidu bolta hai("  <div style='display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;'>");
+  bhidu bolta hai("    <span style='font-family: monospace; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; color: #b6f376;'>dev: bhidu shuru hoja</span>");
+  bhidu bolta hai("    <span style='font-family: monospace; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; color: #b6f376;'>build: bhidu faad de</span>");
+  bhidu bolta hai("  </div>");
+  bhidu bolta hai("</div>");
+khatam bhidu
+`;
+
+        // Create READMEs
+        fs.writeFileSync(
+          path.join(componentsDir, "README.md"),
+          `# Components Folder\n\nPlace your modular components here re bhidu!\n`
+        );
+        fs.writeFileSync(
+          path.join(pagesDir, "README.md"),
+          `# Pages Folder\n\nPlace your page scripts and routing resources here re bhidu!\n`
+        );
+
+        // Create index.bhidu
+        fs.writeFileSync("index.bhidu", TEMPLATE_CODE);
+
+        console.log(`=================================================`);
+        console.log(`✨ Bhidu project scaffolded successfully re bhidu!`);
+        console.log(`📁 Created folders: public/, components/, pages/`);
+        console.log(`📄 Created entry: index.bhidu (Home Page)`);
+        console.log(`🖼️ Logo asset ready at: public/logo.png`);
+        console.log(`=================================================`);
+        console.log(`🚀 Start editing: Edit index.bhidu`);
+        console.log(`👉 Run server: bhidu shuru hoja`);
+        console.log(`👉 Build bundle: bhidu faad de`);
+      } catch (err: any) {
+        console.error(`❌ Scaffolding failed: ${err.message || err}`);
+        process.exit(1);
+      }
+      break;
+    }
     case "help":
     case "-h":
     case "--help":
