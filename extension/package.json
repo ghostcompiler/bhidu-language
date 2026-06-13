@@ -20,7 +20,7 @@
   "activationEvents": [
     "onLanguage:bhidu"
   ],
-  "main": "./dist/extension/src/extension.js",
+  "main": "./dist/extension.js",
   "contributes": {
     "languages": [
       {
@@ -33,7 +33,10 @@
           ".bhidu"
         ],
         "configuration": "./language-configuration.json",
-        "icon": "./logo.png"
+        "icon": {
+          "light": "./logo.png",
+          "dark": "./logo.png"
+        }
       }
     ],
     "grammars": [
@@ -46,12 +49,13 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./"
+    "compile": "esbuild src/extension.ts --bundle --platform=node --target=node16 --external:vscode --outfile=dist/extension.js",
+    "watch": "esbuild src/extension.ts --bundle --platform=node --target=node16 --external:vscode --outfile=dist/extension.js --watch"
   },
   "devDependencies": {
-    "@types/vscode": "^1.75.0",
     "@types/node": "^20.11.24",
+    "@types/vscode": "^1.75.0",
+    "esbuild": "^0.28.1",
     "typescript": "^5.3.3"
   }
 }

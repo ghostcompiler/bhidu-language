@@ -20,7 +20,7 @@
       "patterns": [
         {
           "name": "comment.line.double-slash.bhidu",
-          "match": "//.*$"
+          "match": "\\\\/\\\\/.*$"
         },
         {
           "name": "comment.line.apun-bola.bhidu",
