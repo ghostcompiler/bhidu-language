@@ -1,0 +1,68 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Bhidu Lang",
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#numbers"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.bhidu",
+          "match": "//.*$"
+        },
+        {
+          "name": "comment.line.apun-bola.bhidu",
+          "match": "\\bapun bola\\b:.*$"
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.bhidu",
+          "match": "\\b(chalu kar bhidu|khatam bhidu|agar bhidu|warna agar bhidu|warna bhidu|jab tak bhidu|bas kar bhidu|agli baar bhidu)\\b"
+        },
+        {
+          "name": "storage.type.bhidu",
+          "match": "\\bbhidu ye hai\\b"
+        },
+        {
+          "name": "entity.name.function.bhidu",
+          "match": "\\bbhidu bolta hai\\b"
+        },
+        {
+          "name": "constant.language.bhidu",
+          "match": "\\b(sahi bhidu|galat bhidu|khali bhidu)\\b"
+        }
+      ]
+    },
+    "strings": {
+      "name": "string.quoted.double.bhidu",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.bhidu",
+          "match": "\\\\."
+        }
+      ]
+    },
+    "numbers": {
+      "name": "constant.numeric.bhidu",
+      "match": "\\b\\d+(\\.\\d+)?\\b"
+    }
+  },
+  "scopeName": "source.bhidu"
+}

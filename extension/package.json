@@ -1,0 +1,46 @@
+{
+  "name": "bhidu-vscode",
+  "displayName": "Bhidu Lang Support",
+  "description": "Syntax highlighting, formatting, and live compiler diagnostics for bhidu-lang",
+  "version": "1.0.0",
+  "publisher": "ghostcompiler",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Formatters",
+    "Linters"
+  ],
+  "activationEvents": [
+    "onLanguage:bhidu"
+  ],
+  "main": "./dist/extension/src/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "bhidu",
+        "aliases": ["Bhidu", "bhidu-lang"],
+        "extensions": [".bhidu"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "bhidu",
+        "scopeName": "source.bhidu",
+        "path": "./syntaxes/bhidu.tmLanguage.json"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.75.0",
+    "@types/node": "^20.11.24",
+    "typescript": "^5.3.3"
+  }
+}
