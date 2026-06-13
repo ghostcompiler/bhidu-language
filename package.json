@@ -4,7 +4,7 @@
   "description": "A toy programming language written in TypeScript with Mumbai slang",
   "main": "dist/cli.js",
   "bin": {
-    "bhidu": "./dist/cli.js"
+    "bhidu": "dist/cli.js"
   },
   "scripts": {
     "build": "tsc",
