@@ -4,6 +4,10 @@
   "description": "Syntax highlighting, formatting, and live compiler diagnostics for bhidu-lang",
   "version": "1.0.0",
   "publisher": "ghostcompiler",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ghostcompiler/bhidu-language.git"
+  },
   "engines": {
     "vscode": "^1.75.0"
   },
