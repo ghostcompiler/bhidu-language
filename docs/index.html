@@ -211,6 +211,7 @@
         <p>CLI & Tools</p>
         <a href="#cli">CLI Reference</a>
         <a href="#repl">Interactive REPL</a>
+        <a href="#web-framework">Web Framework</a>
       </div>
 
       <div class="sidebar-group">
@@ -329,6 +330,29 @@ khatam bhidu</code></pre>
         <div class="callout">
           <strong>Under the Hood.</strong>
           Since the parser requires code to reside inside program boundaries, the REPL dynamically wraps each line with entry/exit headers (`chalu kar bhidu` / `khatam bhidu`) on the fly, then executes the AST nodes on a persistent global Environment reference.
+        </div>
+      </section>
+
+      <section id="web-framework" data-title="Web Framework">
+        <h2>Bhidu Web Framework</h2>
+        <p>Build and compile interactive web pages directly using <code>bhidu-lang</code>. It supports project scaffolding, static asset serving, hot reloading, and production compilation.</p>
+        
+        <div class="callout">
+          <strong>1. Scaffold a project:</strong><br>
+          <code>bhidu hagde</code><br>
+          Creates the directory structure (<code>public/</code>, <code>components/</code>, <code>pages/</code>), copies the default brand logo, and writes a starter homepage at <code>index.bhidu</code>.
+        </div>
+
+        <div class="callout">
+          <strong>2. Run local hot-reloading dev server:</strong><br>
+          <code>bhidu shuru hoja</code><br>
+          Starts the development server at <code>http://localhost:3000</code>. It serves assets from <code>public/</code> and triggers a browser hot refresh instantly when you save changes in your code.
+        </div>
+
+        <div class="callout">
+          <strong>3. Build production bundle:</strong><br>
+          <code>bhidu faad de</code><br>
+          Transpiles your slang code to <code>out/index.html</code> and copies the <code>public/</code> folder recursively to <code>out/</code>, ready to deploy to any static provider.
         </div>
       </section>
 

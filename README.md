@@ -194,25 +194,37 @@ bhidu ast program.bhidu
 node dist/cli.js ast program.bhidu
 ```
 
-### 4. Web App Mode (Next.js-style Dev & Build)
+### 4. Bhidu Web Framework (Local Dev & Production Build)
 
-You can build and run interactive web pages inside your browser using `.bhidu` slang code!
+You can bootstrap, build, and run interactive web applications inside the browser using `.bhidu` slang code!
+
+- **Scaffold a Project**:
+  ```bash
+  bhidu hagde
+  ```
+  - Bootstraps a complete folder structure:
+    - `public/`: For static assets (such as images, icons, CSS).
+    - `components/`: For modular reusable components.
+    - `pages/`: For page views.
+  - Copies the default branding logo into `public/logo.png`.
+  - Creates a premium dark-themed homepage entry at `index.bhidu`.
 
 - **Start Hot-Reloading Dev Server**:
   ```bash
   bhidu shuru hoja [file.bhidu]
   ```
   - Launches a local development server at `http://localhost:3000`.
-  - If no file is specified, it defaults to `index.bhidu` (and creates a starter template automatically if it doesn't exist).
-  - Listens for file changes and **automatically reloads the browser** (Hot Refresh) on file save.
-  - If your code has syntax or tokenizer errors, it renders a custom Next.js-style **Red Screen Slang Error Overlay** displaying error traces in Mumbai local slang!
-  - `bhidu bolta hai("<html>")` automatically renders as live HTML on the page!
-- **Compile & Bundle for Production**:
+  - Serves static assets directly from the `public/` folder (e.g. `/logo.png` resolves to `public/logo.png`).
+  - Automatically watches the entry file for changes and performs a **Hot Refresh** on the page.
+  - If syntax errors occur, it displays a premium **Red Screen Slang Error Overlay** in Mumbai local slang to help you debug quickly!
+
+- **Compile & Build for Production**:
   ```bash
   bhidu faad de [file.bhidu]
   ```
-  - Transpiles `.bhidu` code to standard HTML & JS.
-  - Generates a standalone, dependency-free static build folder named `out/` (e.g. `out/index.html`), ready to be served on GitHub Pages, Netlify, or anywhere else.
+  - Transpiles `.bhidu` code to standard static HTML/JS.
+  - Generates a standalone production output folder named `out/` (e.g. `out/index.html`).
+  - Recursively copies all static assets from `public/` into `out/` (e.g. copying `public/logo.png` to `out/logo.png`), making the build ready to deploy to GitHub Pages, Netlify, Vercel, or any static provider.
 
 ---
 
