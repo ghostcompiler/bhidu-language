@@ -1,11 +1,12 @@
+<p align="center">
+  <img src="https://res.cloudinary.com/djgvfl1tv/image/upload/v1780666791/logo_mqnqn4.png" alt="Bhidu Language" width="180">
+</p>
 
+<h1 align="center">Bhidu Language</h1>
 
-# Bhidu Language
-
-A premium, feature-rich toy programming language written in TypeScript with Mumbai local slang, featuring a custom lexer, recursive-descent parser, nested environment scoping, CLI, and an interactive REPL.
-
-
-
+<p align="center">
+  A premium, feature-rich toy programming language written in TypeScript with Mumbai local slang, featuring a custom lexer, recursive-descent parser, nested environment scoping, CLI, and an interactive REPL.
+</p>
 ---
 
 ## 📜 Table of Contents
@@ -139,6 +140,22 @@ npm run build
 
 Once globally installed (`npm install -g bhidu-lang`) or linked locally (`npm link`), you can execute `bhidu` directly from anywhere in your terminal.
 
+### CLI Command Reference
+
+Here is the complete list of all commands supported by the `bhidu` compiler CLI:
+
+| Command Syntax | Description | Usage Example |
+| :--- | :--- | :--- |
+| `bhidu run <file.bhidu>` | Execute a `.bhidu` script file directly in the console. | `bhidu run test.bhidu` |
+| `bhidu repl` or `bhidu` | Start the interactive REPL shell to run statements line-by-line. | `bhidu repl` |
+| `bhidu ast <file.bhidu>` | Print the parsed Abstract Syntax Tree (AST) as structured JSON. | `bhidu ast test.bhidu` |
+| `bhidu hagde [project-name]` | Scaffold a new project structure (`public/`, `components/`, `pages/`, `index.bhidu`). Prompts if name is omitted. | `bhidu hagde my-web-app` |
+| `bhidu shuru hoja [file.bhidu]` | Start the live-reloading Dev Server on port 3000 with static asset resolution. | `bhidu shuru hoja` |
+| `bhidu faad de [file.bhidu]` | Compile the application to a production-ready static HTML bundle in `out/`. | `bhidu faad de` |
+| `bhidu help` | Display the helper menu with CLI commands. | `bhidu help` |
+
+---
+
 ### 1. Running a `.bhidu` Script
 
 Write your code inside a `.bhidu` file (e.g. `program.bhidu`) and execute it directly:
@@ -225,6 +242,21 @@ You can bootstrap, build, and run interactive web applications inside the browse
   - Transpiles `.bhidu` code to standard static HTML/JS.
   - Generates a standalone production output folder named `out/` (e.g. `out/index.html`).
   - Recursively copies all static assets from `public/` into `out/` (e.g. copying `public/logo.png` to `out/logo.png`), making the build ready to deploy to GitHub Pages, Netlify, Vercel, or any static provider.
+
+---
+
+## 💻 VS Code IDE Extension
+
+`bhidu-lang` comes with a dedicated VS Code extension providing:
+* **Syntax Highlighting**: Beautiful color-coding for all slang keywords.
+* **Document Formatting**: Formats your code cleanly with standard indentation.
+* **Real-time Diagnostics (Linter)**: Displays red squiggly lines in the editor on syntax errors with Mumbai slang error messages in real-time as you write!
+
+### Install Extension
+Install the extension package from the workspace root:
+```bash
+code --install-extension extension/bhidu-vscode-1.0.1.vsix
+```
 
 ---
 

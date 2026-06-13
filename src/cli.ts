@@ -278,7 +278,7 @@ khatam bhidu
         }
       }
 
-      console.log(`🛠️ Scaffolding a complete Bhidu project inside '${projectName}'...`);
+      // Start scaffolding
       try {
         const projectDir = path.resolve(projectName);
         const publicDir = path.join(projectDir, "public");
@@ -334,15 +334,25 @@ khatam bhidu
         // Create index.bhidu
         fs.writeFileSync(path.join(projectDir, "index.bhidu"), TEMPLATE_CODE);
 
-        console.log(`=================================================`);
-        console.log(`✨ Bhidu project scaffolded successfully re bhidu!`);
-        console.log(`📁 Created folders inside: ${projectName}/`);
-        console.log(`📄 Created entry: ${projectName}/index.bhidu (Home Page)`);
-        console.log(`🖼️ Logo asset ready at: ${projectName}/public/logo.png`);
-        console.log(`=================================================`);
-        console.log(`🚀 Start editing: Edit ${projectName}/index.bhidu`);
-        console.log(`👉 Run server: cd ${projectName} && bhidu shuru hoja`);
-        console.log(`👉 Build bundle: cd ${projectName} && bhidu faad de`);
+        const absoluteProjectDir = path.resolve(projectDir);
+        console.log(`\nCreating a new Bhidu app in \x1b[1m\x1b[32m${absoluteProjectDir}\x1b[0m.\n`);
+        console.log(`Initializing project...`);
+        console.log(`  \x1b[36m✔\x1b[0m Creating project directory: \x1b[90m${projectName}/\x1b[0m`);
+        console.log(`  \x1b[36m✔\x1b[0m Creating subfolders: \x1b[90mpublic/, components/, pages/\x1b[0m`);
+        console.log(`  \x1b[36m✔\x1b[0m Creating entry file: \x1b[90m${projectName}/index.bhidu\x1b[0m`);
+        console.log(`  \x1b[36m✔\x1b[0m Copying brand assets: \x1b[90mpublic/logo.png\x1b[0m`);
+        console.log(`  \x1b[36m✔\x1b[0m Writing folder documentation: \x1b[90mcomponents/README.md, pages/README.md\x1b[0m`);
+        
+        console.log(`\n\x1b[1m\x1b[32mSuccess!\x1b[0m Created \x1b[1m${projectName}\x1b[0m at \x1b[32m${absoluteProjectDir}\x1b[0m\n`);
+        console.log(`Inside that directory, you can run several commands:\n`);
+        console.log(`  \x1b[1mbhidu shuru hoja\x1b[0m`);
+        console.log(`    Starts the live-reloading development server.\n`);
+        console.log(`  \x1b[1mbhidu faad de\x1b[0m`);
+        console.log(`    Builds the production-ready static HTML bundle.\n`);
+        console.log(`We suggest that you begin by typing:\n`);
+        console.log(`  \x1b[36mcd\x1b[0m ${projectName}`);
+        console.log(`  \x1b[36mbhidu shuru hoja\x1b[0m\n`);
+        console.log(`🕶️  \x1b[1mHappy coding, bhidu!\x1b[0m\n`);
       } catch (err: any) {
         console.error(`❌ Scaffolding failed: ${err.message || err}`);
         process.exit(1);

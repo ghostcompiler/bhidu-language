@@ -212,6 +212,7 @@
         <a href="#cli">CLI Reference</a>
         <a href="#repl">Interactive REPL</a>
         <a href="#web-framework">Web Framework</a>
+        <a href="#vscode-extension">VS Code Extension</a>
       </div>
 
       <div class="sidebar-group">
@@ -299,17 +300,55 @@ npm link</code></pre>
       </section>
 
       <section id="cli" data-title="CLI Reference">
-        <h2>CLI Reference</h2>
-        <p>The compiler binary is mapped globally to `bhidu` (or you can invoke it using `node dist/cli.js`). Use the following command parameters:</p>
+        <h2>CLI Reference & Commands</h2>
+        <p>The compiler binary is mapped globally to <code>bhidu</code> (or you can invoke it using <code>node dist/cli.js</code>). Here is the complete list of all commands available in the CLI:</p>
         
-        <div class="command-list">
-          <p><strong>Execute a file:</strong></p>
-          <code>bhidu run filename.bhidu</code>
-          <p><strong>Inspecting AST Structure:</strong></p>
-          <code>bhidu ast filename.bhidu</code>
-          <p><strong>Run Interactive REPL:</strong></p>
-          <code>bhidu repl</code>
-        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Command Syntax</th>
+              <th>Description</th>
+              <th>Usage Example</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>bhidu run &lt;file.bhidu&gt;</code></td>
+              <td>Execute a <code>.bhidu</code> script file directly in your terminal.</td>
+              <td><code>bhidu run test.bhidu</code></td>
+            </tr>
+            <tr>
+              <td><code>bhidu repl</code> or <code>bhidu</code></td>
+              <td>Start the interactive REPL shell to run statements line-by-line.</td>
+              <td><code>bhidu repl</code></td>
+            </tr>
+            <tr>
+              <td><code>bhidu ast &lt;file.bhidu&gt;</code></td>
+              <td>Print the parsed Abstract Syntax Tree (AST) as structured JSON.</td>
+              <td><code>bhidu ast test.bhidu</code></td>
+            </tr>
+            <tr>
+              <td><code>bhidu hagde [project-name]</code></td>
+              <td>Scaffold a new project folder structure with <code>public/</code>, <code>components/</code>, <code>pages/</code>, and <code>index.bhidu</code>. Prompts if project name is omitted.</td>
+              <td><code>bhidu hagde my-web-app</code></td>
+            </tr>
+            <tr>
+              <td><code>bhidu shuru hoja [file.bhidu]</code></td>
+              <td>Starts the live-reloading Dev Server (default: <code>index.bhidu</code>) on port 3000 with static asset resolution from the <code>public/</code> folder.</td>
+              <td><code>bhidu shuru hoja</code></td>
+            </tr>
+            <tr>
+              <td><code>bhidu faad de [file.bhidu]</code></td>
+              <td>Compiles the application to production-ready static HTML in <code>out/index.html</code> and copies all files from <code>public/</code> to <code>out/</code>.</td>
+              <td><code>bhidu faad de</code></td>
+            </tr>
+            <tr>
+              <td><code>bhidu help</code></td>
+              <td>Display the helper menu with syntax templates.</td>
+              <td><code>bhidu help</code></td>
+            </tr>
+          </tbody>
+        </table>
       </section>
 
       <section id="repl" data-title="Interactive REPL">
@@ -353,6 +392,26 @@ khatam bhidu</code></pre>
           <strong>3. Build production bundle:</strong><br>
           <code>bhidu faad de</code><br>
           Transpiles your slang code to <code>out/index.html</code> and copies the <code>public/</code> folder recursively to <code>out/</code>, ready to deploy to any static provider.
+        </div>
+      </section>
+
+      <section id="vscode-extension" data-title="VS Code Extension">
+        <h2>VS Code IDE Extension</h2>
+        <p>Enhance your development experience with the dedicated VS Code extension for <code>bhidu-lang</code>. It supports syntax highlighting, document formatting, and real-time linter diagnostics.</p>
+        
+        <div class="callout">
+          <strong>Features:</strong>
+          <ul>
+            <li><strong>Syntax Highlighting:</strong> Custom TextMate grammar mapping slang keywords to standard VS Code token classes.</li>
+            <li><strong>Document Formatting:</strong> Indents code lines automatically between block boundaries (brackets or entry/exit keywords).</li>
+            <li><strong>Diagnostics (Linter):</strong> Checks code dynamically on edit/save and highlights syntax errors with red squiggles, showing slang error messages.</li>
+          </ul>
+        </div>
+
+        <div class="callout">
+          <strong>Installation:</strong><br>
+          Run the following command in your terminal from the project root folder to install the prepackaged extension:
+          <pre><code>code --install-extension extension/bhidu-vscode-1.0.1.vsix</code></pre>
         </div>
       </section>
 
