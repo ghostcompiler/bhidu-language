@@ -9,7 +9,7 @@ import { Interpreter } from "./interpreter";
 import { Environment } from "./environment";
 import { startDevServer, generateHTML } from "./server";
 
-const version = "1.0.3";
+const version = "1.0.4";
 
 function printHelp() {
   console.log(`
@@ -19,6 +19,7 @@ function printHelp() {
     bhidu run <file.bhidu>    Execute a .bhidu file
     bhidu ast <file.bhidu>    Print the Abstract Syntax Tree (AST) of a file
     bhidu repl                Start the interactive REPL
+    bhidu hagde [project]     Scaffold a new Bhidu web app structure
     bhidu shuru hoja [file]   Start the live-reloading Dev Server (default: index.bhidu)
     bhidu faad de [file]      Compile project to a static HTML page in out/ (default: index.bhidu)
     bhidu help                Show this help message

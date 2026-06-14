@@ -30,4 +30,4 @@ npm install -g bhidu-lang
 
 The complete, thorough guides and documentation reference (including how to scaffold projects with `bhidu hagde`, run files, compile web apps, use the REPL, write reactive components, and install the VS Code extension) is available inside the documentation pages:
 
-👉 **[docs/index.html](file:///Users/ghostcompiler/Desktop/bhidu-lang/docs/index.html)**
+👉 **[ghostcompiler.github.io/bhidu-language/](https://ghostcompiler.github.io/bhidu-language/)**

@@ -1,6 +1,6 @@
 {
   "name": "bhidu-lang",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A toy programming language written in TypeScript with Mumbai slang",
   "main": "dist/cli.js",
   "bin": {
