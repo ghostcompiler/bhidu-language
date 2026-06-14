@@ -2,7 +2,7 @@
   "name": "bhidu-vscode",
   "displayName": "Bhidu Lang Support",
   "description": "Syntax highlighting, formatting, and live compiler diagnostics for bhidu-lang",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "publisher": "ghostcompiler",
   "icon": "logo.png",
   "repository": {

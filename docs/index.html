@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>bhidu-lang v1.0.2 Documentation</title>
+  <title>bhidu-lang v1.0.3 Documentation</title>
   <meta name="description" content="Complete documentation reference for bhidu-lang. Mumbai's own toy programming language written in TypeScript, featuring variables, loops, scoping, and a CLI/REPL.">
   <meta name="author" content="Ghost Compiler">
   <meta name="robots" content="index,follow">
@@ -20,13 +20,13 @@
   {
     "@context": "https://schema.org",
     "@type": "TechArticle",
-    "headline": "bhidu-lang v1.0.2 Documentation",
+    "headline": "bhidu-lang v1.0.3 Documentation",
     "about": "Mumbai slang toy programming language written in TypeScript",
     "author": {
       "@type": "Organization",
       "name": "Ghost Compiler"
     },
-    "version": "1.0.2"
+    "version": "1.0.3"
   }
   </script>
 
@@ -159,7 +159,7 @@
       <img src="logo.png" alt="bhidu-lang logo">
       <span>bhidu-lang</span>
     </a>
-    <span class="version-pill">v1.0.2</span>
+    <span class="version-pill">v1.0.3</span>
     <div class="doc-search">
       <input id="docSearch" type="search" placeholder="Search documentation">
     </div>
@@ -233,7 +233,7 @@
     <main class="doc-article">
       
       <section id="overview" data-title="Overview">
-        <p class="eyebrow">Documentation v1.0.2</p>
+        <p class="eyebrow">Documentation v1.0.3</p>
         <h1>Overview</h1>
         <p class="lead"><strong>bhidu-lang</strong> is a premium, feature-rich toy programming language written in TypeScript featuring Mumbai's own local slang (inspired by Jackie Shroff). Compile, run scripts, test environment scopes, and play with error messages, bole toh ekdum jhakaas! 🕶️</p>
         <div class="callout">
@@ -244,14 +244,11 @@
 
       <section id="installation" data-title="Installation">
         <h2>Installation</h2>
-        <p>Install the library globally via NPM to make the command line tools available anywhere on your machine:</p>
+        <p>Install the compiler globally via NPM to make the command line tools available anywhere on your machine:</p>
         <pre><code>npm install -g bhidu-lang</code></pre>
-        <p>To run during local development, clone the repository, build, and use npm link:</p>
-        <pre><code>git clone https://github.com/ghostcompiler/bhidu-language.git
-cd bhidu-language
-npm install
-npm run build
-npm link</code></pre>
+        <div class="callout">
+          <strong>Bole toh update complete!</strong> Make sure you have Node.js (v18+) installed. Once the package is installed globally, the <code>bhidu</code> binary will be ready to execute from any folder in your terminal.
+        </div>
       </section>
 
       <section id="playground" data-title="Playground">
@@ -356,7 +353,7 @@ npm link</code></pre>
         <p>Start a live interactive session where you can type code statements line-by-line. The REPL preserves variables in a persistent scope environment across lines.</p>
         <pre><code>$ bhidu repl
 =========================================
-   Bhidu-Lang Interactive REPL v1.0.2
+   Bhidu-Lang Interactive REPL v1.0.3
    Sab chalta hai bhidu! Type '.exit' to exit.
 =========================================
 chalu kar bhidu
@@ -374,24 +371,33 @@ khatam bhidu</code></pre>
 
       <section id="web-framework" data-title="Web Framework">
         <h2>Bhidu Web Framework</h2>
-        <p>Build and compile interactive web pages directly using <code>bhidu-lang</code>. It supports project scaffolding, static asset serving, hot reloading, and production compilation.</p>
+        <p>Build and compile interactive web pages directly using <code>bhidu-lang</code>. It supports zero-config project scaffolding, asset pipeline serving, local hot-reloading dev server, reactive state updates, and static production bundling.</p>
         
         <div class="callout">
-          <strong>1. Scaffold a project:</strong><br>
-          <code>bhidu hagde</code><br>
-          Creates the directory structure (<code>public/</code>, <code>components/</code>, <code>pages/</code>), copies the default brand logo, and writes a starter homepage at <code>index.bhidu</code>.
+          <strong>1. Project Initialization & Scaffolding (bhidu hagde):</strong><br>
+          To create and initialize a new Bhidu web application, run:
+          <pre><code>bhidu hagde [project-name]</code></pre>
+          If you omit the project name, the CLI will interactively ask: <em>"bhidu is project ka naam kya rkhna h wo to bta"</em>. This command bootstraps a professional, ready-to-use directory structure:
+          <ul>
+            <li><code>public/</code>: For static assets (holds <code>logo.png</code> by default).</li>
+            <li><code>components/</code>: For modular, reusable components.</li>
+            <li><code>pages/</code>: For additional application subpages.</li>
+            <li><code>index.bhidu</code>: The entry point rendering a premium dark-themed layout.</li>
+          </ul>
         </div>
 
         <div class="callout">
-          <strong>2. Run local hot-reloading dev server:</strong><br>
-          <code>bhidu shuru hoja</code><br>
-          Starts the development server at <code>http://localhost:3000</code>. It serves assets from <code>public/</code> and triggers a browser hot refresh instantly when you save changes in your code.
+          <strong>2. Run Local Development Server (bhidu shuru hoja):</strong><br>
+          Start a hot-reloading web server to preview your application on <code>http://localhost:3000</code>:
+          <pre><code>bhidu shuru hoja [file.bhidu]</code></pre>
+          This server watches your code files for changes, automatically refreshes the browser page on save, compiles and bundles component CSS, and serves static files from the <code>public/</code> folder seamlessly.
         </div>
 
         <div class="callout">
-          <strong>3. Build production bundle:</strong><br>
-          <code>bhidu faad de</code><br>
-          Transpiles your slang code to <code>out/index.html</code> and copies the <code>public/</code> folder recursively to <code>out/</code>, ready to deploy to any static provider.
+          <strong>3. Compile for Production (bhidu faad de):</strong><br>
+          Compile your dynamic Bhidu application into standalone static HTML and JS ready for deployment:
+          <pre><code>bhidu faad de [file.bhidu]</code></pre>
+          This transpiles your slang code to <code>out/index.html</code>, collects and bundles all styles, and copies the <code>public/</code> folder assets recursively to <code>out/</code>, making the build deployable to GitHub Pages, Netlify, Vercel, or any other static host.
         </div>
 
         <div class="callout">
@@ -420,7 +426,7 @@ khatam bhidu</code></pre>
         <div class="callout">
           <strong>Installation:</strong><br>
           Run the following command in your terminal from the project root folder to install the prepackaged extension:
-          <pre><code>code --install-extension extension/bhidu-vscode-1.0.2.vsix</code></pre>
+          <pre><code>code --install-extension extension/bhidu-vscode-1.0.3.vsix</code></pre>
         </div>
       </section>
 
