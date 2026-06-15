@@ -1,8 +1,33 @@
 import { ASTNode, ProgramNode } from "./types";
 
 export class Compiler {
+  private static readonly PROTECTED_IDENTIFIERS = new Set([
+    "__proto__",
+    "constructor",
+    "prototype",
+    "bhiduRender",
+    "bhiduReRender",
+    "bhiduSetState",
+  ]);
+
   compile(program: ProgramNode): string {
     return this.compileBlock(program.body);
+  }
+
+  private compileIdentifier(name: string): string {
+    if (Compiler.PROTECTED_IDENTIFIERS.has(name)) {
+      throw new Error(`Variable name '${name}' is reserved by the Bhidu web runtime.`);
+    }
+    return `bhiduState[${JSON.stringify(name)}]`;
+  }
+
+  private compileString(value: string): string {
+    return JSON.stringify(value)
+      .replace(/</g, "\\u003c")
+      .replace(/>/g, "\\u003e")
+      .replace(/&/g, "\\u0026")
+      .replace(/\u2028/g, "\\u2028")
+      .replace(/\u2029/g, "\\u2029");
   }
 
   private compileBlock(body: ASTNode[]): string {
@@ -19,11 +44,12 @@ export class Compiler {
 
       case "VarDec": {
         const initVal = node.init !== null ? this.compileNode(node.init) : "null";
-        return `window.${node.id} = window.${node.id} !== undefined ? window.${node.id} : ${initVal};`;
+        const identifier = this.compileIdentifier(node.id);
+        return `${identifier} = ${identifier} !== undefined ? ${identifier} : ${initVal};`;
       }
 
       case "Assignment":
-        return `window.${node.id} = ${this.compileNode(node.value)};`;
+        return `${this.compileIdentifier(node.id)} = ${this.compileNode(node.value)};`;
 
       case "Print": {
         const arg = this.compileNode(node.arguments[0]);
@@ -64,12 +90,12 @@ export class Compiler {
         if (node.value === true) return "true";
         if (node.value === false) return "false";
         if (typeof node.value === "string") {
-          return JSON.stringify(node.value);
+          return this.compileString(node.value);
         }
         return String(node.value);
 
       case "Identifier":
-        return `window.${node.name}`;
+        return this.compileIdentifier(node.name);
 
       case "BinaryExpression":
         return `(${this.compileNode(node.left)} ${node.operator} ${this.compileNode(node.right)})`;

@@ -2,6 +2,11 @@ import { describe, it, expect } from "vitest";
 import { tokenize } from "../src/lexer";
 import { Parser } from "../src/parser";
 import { Interpreter } from "../src/interpreter";
+import { Compiler } from "../src/compiler";
+import { generateHTML } from "../src/server";
+import * as fs from "fs";
+import * as os from "os";
+import * as path from "path";
 
 describe("Bhidu Lang Lexer", () => {
   it("should tokenize keywords and identifiers", () => {
@@ -131,5 +136,56 @@ describe("Bhidu Lang Interpreter", () => {
     khatam bhidu`;
     const outputs = runCode(code);
     expect(outputs).toEqual(["20", "10"]);
+  });
+});
+
+describe("Bhidu Lang Web Compiler Security", () => {
+  const compileCode = (code: string): string => {
+    const parser = new Parser(tokenize(code));
+    return new Compiler().compile(parser.parse());
+  };
+
+  it("escapes HTML parser boundaries in string literals", () => {
+    const output = compileCode(`chalu kar bhidu
+      bhidu bolta hai("</script><script>alert(1)</script>");
+    khatam bhidu`);
+
+    expect(output).not.toContain("</script>");
+    expect(output).toContain("\\u003c/script\\u003e");
+  });
+
+  it("rejects identifiers reserved by the web runtime", () => {
+    expect(() =>
+      compileCode(`chalu kar bhidu
+        bhidu ye hai bhiduReRender = 1;
+      khatam bhidu`)
+    ).toThrow("reserved by the Bhidu web runtime");
+  });
+
+  it("keeps hostile strings and CSS inside their HTML parser contexts", () => {
+    const projectDir = fs.mkdtempSync(path.join(os.tmpdir(), "bhidu-security-"));
+    const entryPath = path.join(projectDir, "index.bhidu");
+
+    try {
+      fs.writeFileSync(
+        entryPath,
+        `chalu kar bhidu
+          bhidu bolta hai("</script><script>alert(1)</script><img src=x onerror=alert(1)>");
+        khatam bhidu`
+      );
+      fs.writeFileSync(
+        path.join(projectDir, "attack.css"),
+        "</style><script>alert(2)</script>"
+      );
+
+      const html = generateHTML(entryPath, false);
+      expect(html.match(/<\/script>/gi)).toHaveLength(1);
+      expect(html).not.toContain("</script><script>");
+      expect(html).not.toContain("</style><script>");
+      expect(html).not.toContain("innerHTML");
+      expect(html).not.toContain("window[name]");
+    } finally {
+      fs.rmSync(projectDir, { recursive: true, force: true });
+    }
   });
 });

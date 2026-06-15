@@ -9,7 +9,7 @@ import { Interpreter } from "./interpreter";
 import { Environment } from "./environment";
 import { startDevServer, generateHTML } from "./server";
 
-const version = "1.0.4";
+const version = "1.0.5";
 
 function printHelp() {
   console.log(`

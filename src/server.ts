@@ -28,7 +28,7 @@ function collectCSS(dir: string): string {
     }
   }
   walk(dir);
-  return styles;
+  return styles.replace(/</g, "\\3C ");
 }
 
 /**
@@ -144,8 +144,96 @@ function getSuccessTemplate(jsCode: string, isDev: boolean, componentStyles = ""
 
   <script>
     // Reactive State & Component CSS System Runtime
-    const effectStore = [];
-    let effectIndex = 0;
+    const allowedTags = new Set([
+      "A", "B", "BR", "BUTTON", "CODE", "DIV", "EM", "H1", "H2", "H3",
+      "H4", "H5", "H6", "HR", "I", "IMG", "LI", "OL", "P", "PRE",
+      "SECTION", "SMALL", "SPAN", "STRONG", "UL"
+    ]);
+    const allowedAttributes = new Set([
+      "alt", "aria-label", "class", "height", "href", "id", "rel", "role",
+      "src", "style", "target", "title", "type", "width"
+    ]);
+    const protectedStateNames = new Set([
+      "__proto__", "constructor", "prototype", "bhiduRender",
+      "bhiduReRender", "bhiduSetState"
+    ]);
+    const bhiduState = Object.create(null);
+
+    function isSafeUrl(value, allowImageData) {
+      const compact = value.trim().replace(/[\\u0000-\\u0020]+/g, "");
+      if (compact.startsWith("#") || compact.startsWith("/") || compact.startsWith("./") || compact.startsWith("../")) {
+        return true;
+      }
+      try {
+        const url = new URL(compact, window.location.href);
+        return url.protocol === "http:" ||
+          url.protocol === "https:" ||
+          url.protocol === "mailto:" ||
+          (allowImageData && /^data:image\\/(?:png|gif|jpeg|webp);base64,/i.test(compact));
+      } catch {
+        return false;
+      }
+    }
+
+    function attachStateHandler(element, source) {
+      const match = source.match(/^\\s*bhiduSetState\\(\\s*['"]([A-Za-z_][A-Za-z0-9_]*)['"]\\s*,\\s*([A-Za-z_][A-Za-z0-9_]*)\\s*([+-])\\s*(\\d+(?:\\.\\d+)?)\\s*\\)\\s*$/);
+      if (!match || match[1] !== match[2]) return;
+      const [, name, , operator, amountText] = match;
+      if (protectedStateNames.has(name)) return;
+      const amount = Number(amountText);
+      element.addEventListener("click", () => {
+        const current = Number(bhiduState[name]);
+        if (!Number.isFinite(current)) return;
+        window.bhiduSetState(name, operator === "+" ? current + amount : current - amount);
+      });
+    }
+
+    function sanitizeMarkup(markup) {
+      const parsed = new DOMParser().parseFromString("<body>" + markup, "text/html");
+      const fragment = document.createDocumentFragment();
+
+      function sanitizeNode(node) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          return document.createTextNode(node.textContent || "");
+        }
+        if (node.nodeType !== Node.ELEMENT_NODE || !allowedTags.has(node.tagName)) {
+          const children = document.createDocumentFragment();
+          for (const child of Array.from(node.childNodes)) {
+            const sanitized = sanitizeNode(child);
+            if (sanitized) children.appendChild(sanitized);
+          }
+          return children;
+        }
+
+        const clean = document.createElement(node.tagName.toLowerCase());
+        for (const attribute of Array.from(node.attributes)) {
+          const name = attribute.name.toLowerCase();
+          if (name === "onclick") {
+            attachStateHandler(clean, attribute.value);
+          } else if (allowedAttributes.has(name)) {
+            if ((name === "href" && !isSafeUrl(attribute.value, false)) ||
+                (name === "src" && !isSafeUrl(attribute.value, node.tagName === "IMG"))) {
+              continue;
+            }
+            clean.setAttribute(name, attribute.value);
+          }
+        }
+        if (clean.tagName === "A" && clean.getAttribute("target") === "_blank") {
+          clean.setAttribute("rel", "noopener noreferrer");
+        }
+        for (const child of Array.from(node.childNodes)) {
+          const sanitized = sanitizeNode(child);
+          if (sanitized) clean.appendChild(sanitized);
+        }
+        return clean;
+      }
+
+      for (const child of Array.from(parsed.body.childNodes)) {
+        const sanitized = sanitizeNode(child);
+        if (sanitized) fragment.appendChild(sanitized);
+      }
+      return fragment;
+    }
 
     function bhiduRender(val) {
       const container = document.getElementById("bhidu-root");
@@ -160,9 +248,8 @@ function getSuccessTemplate(jsCode: string, isDev: boolean, componentStyles = ""
       if (val === true) output = "sahi bhidu";
       if (val === false) output = "galat bhidu";
 
-      // If output is string and contains HTML tags (including closing tags like </div >), render as innerHTML
       if (typeof output === "string" && /<[a-z0-9\\/!]/i.test(output)) {
-        div.innerHTML = output;
+        div.appendChild(sanitizeMarkup(output));
       } else {
         div.textContent = String(output);
       }
@@ -172,37 +259,24 @@ function getSuccessTemplate(jsCode: string, isDev: boolean, componentStyles = ""
 
     // Rerender trigger helper
     window.bhiduReRender = function() {
-      effectIndex = 0;
       const container = document.getElementById("bhidu-root");
-      if (container) container.innerHTML = "";
+      if (container) container.replaceChildren();
       
       try {
         ${jsCode}
       } catch (err) {
         console.error("Runtime error in bhidu code:", err);
-        bhiduRender('<span style="color: #ff5252; font-weight: bold;">[Runtime Lafda]: ' + err.message + '</span>');
+        bhiduRender("[Runtime Lafda]: " + (err instanceof Error ? err.message : String(err)));
       }
     };
 
     // State updater
     window.bhiduSetState = function(name, val) {
-      window[name] = val;
+      if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(name) || protectedStateNames.has(name)) {
+        throw new Error("Invalid or protected Bhidu state name.");
+      }
+      bhiduState[name] = val;
       window.bhiduReRender();
-    };
-
-    // useEffect hook replacement
-    window.bhiduEffect = function(callback, deps) {
-      const oldDeps = effectStore[effectIndex];
-      let hasChanged = true;
-      if (oldDeps && deps) {
-        hasChanged = deps.some((dep, i) => dep !== oldDeps[i]);
-      }
-      if (hasChanged) {
-        effectStore[effectIndex] = deps;
-        // Schedule effect run asynchronously after rendering finishes
-        setTimeout(callback, 0);
-      }
-      effectIndex++;
     };
 
     // Initial render
