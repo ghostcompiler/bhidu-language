@@ -8,6 +8,12 @@
   A premium, feature-rich toy programming language written in TypeScript with Mumbai local slang, featuring a custom lexer, recursive-descent parser, nested environment scoping, CLI, and an interactive REPL.
 </p>
 
+<p align="center">
+    <img src="https://img.shields.io/github/stars/ghostcompiler/bhidu-language?style=for-the-badge&logo=github" />
+    <img src="https://img.shields.io/npm/dt/bhidu-lang?style=for-the-badge&logo=npm" />
+    <img src="https://img.shields.io/npm/v/bhidu-lang?style=for-the-badge&logo=npm" />
+</p>
+
 ---
 
 ## ⚡ About
